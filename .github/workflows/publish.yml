@@ -13,16 +13,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # This workflow contains a "changes" job and a dependent "build" job
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      # Expose matched filters as job 'dirs' output variable
-      dirs: ${{ steps.filter.outputs.changes }}
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
   build:
     needs: changes
     # The type of runner that the job will run on
@@ -46,7 +36,7 @@ jobs:
           echo "$HOME/go/bin" >> $GITHUB_PATH
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       # Make artifacts, in particular the I-D HTML-formatted version
       - name: Make artifacts
