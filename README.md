@@ -2,7 +2,7 @@
 
 This is the source repo for the TLS Attestation Internet Draft.
 
-The published version is available on the [Datatracker]([https://datatracker.ietf.org/doc/draft-fossati-tls-attestation/).
+The published version is available on the [Datatracker](https://datatracker.ietf.org/doc/draft-fossati-tls-attestation/).
 
 The latest editor's draft is [here](https://www.sheffer.org/draft-tls-attestation/draft-fossati-tls-attestation.html).
 
