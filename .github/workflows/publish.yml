@@ -1,0 +1,68 @@
+# This workflow is triggered by a push into main from certain directories
+# and publishes the Internet Draft into Github Pages (the gh-pages branch)
+
+name: Build-I-D
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push events (including PR merge) but only for the main branch
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # This workflow contains a "changes" job and a dependent "build" job
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      # Expose matched filters as job 'dirs' output variable
+      dirs: ${{ steps.filter.outputs.changes }}
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+  build:
+    needs: changes
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Create IETF I-D environment
+      - name: Create I-D environment
+        run: |
+          sudo gem install kramdown-rfc2629
+          sudo pip3 install xml2rfc
+          # Only kramdown-rfc2629 and xml2rfc are generic.
+          # The rest is fancy stuff for STAR Delegation
+          sudo pip3 install svgcheck
+          go get github.com/blampe/goat
+          sudo gem install cddl
+          sudo npm install -g ajv
+          sudo npm install -g ajv-formats
+          # Add to system path
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Make artifacts, in particular the I-D HTML-formatted version
+      - name: Make artifacts
+        run: |
+          make
+
+      # Create output
+      - name: Create output
+        run: |
+          mv *.html docs/
+
+      # Publish to Github Pages
+      - name: Publish
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: docs # The folder the action should deploy.
+          target-folder: docs
+          clean: false # keep old files
