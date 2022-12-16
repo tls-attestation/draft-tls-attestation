@@ -53,7 +53,6 @@ author:
        organization: Arm Limited
        email: Yogesh.Deshpande@arm.com
 
-
 normative:
   RFC2119:
   RFC8446:
