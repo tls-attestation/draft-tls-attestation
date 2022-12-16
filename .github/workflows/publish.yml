@@ -42,7 +42,7 @@ jobs:
       # Create output
       - name: Create output
         run: |
-	  mkdir docs
+          mkdir docs
           mv *.html docs/
 
       # Publish to Github Pages
