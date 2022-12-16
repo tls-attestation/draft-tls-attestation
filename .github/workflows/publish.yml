@@ -27,10 +27,7 @@ jobs:
           # Only kramdown-rfc2629 and xml2rfc are generic.
           # The rest is fancy stuff for STAR Delegation
           sudo pip3 install svgcheck
-          go get github.com/blampe/goat
-          sudo gem install cddl
-          sudo npm install -g ajv
-          sudo npm install -g ajv-formats
+          npm install -g aasvg
           # Add to system path
           echo "$HOME/go/bin" >> $GITHUB_PATH
 
