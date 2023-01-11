@@ -751,6 +751,62 @@ registry {{TLS-Ext-Registry}}, as follows:
 
 --- back
 
+# X.509 and Attestation usage variants
+
+The inclusion of attestation results and evidence as part of the TLS
+handshake offers the relying party information about the state of the
+workload and its cryptographic keys, but lacks the means to specify a
+stable identity to the workload in question. While the end-to-end system
+could solve this problem by including an identity as part of the
+attestation results, some use-cases require the use of traditional PKI
+mechanisms for this. It is therefore important to consider the possible
+approaches for combining regular X.509 certificates and attestation within
+one handshake.
+
+1. X.509 certificates only: no attestation metadata is carried across,
+   authentication relies on PKI alone - regular TLS with X.509 certificates
+2. X.509 certificates containing attestation extension: the certificates in
+   the Certificate message carry some sort of attestation metadata in
+   extensions
+  * since this draft is primarily concerned with attestation as first-class
+    credentials, this variant is not covered by our work
+  * within this approach there are a few potential cases with different
+    syntax and semantics: 
+    * Self-signed certificate with attestation evidence in an extension
+    (e.g., RA-TLS): the device acts as a CA for its own certificates,
+    including the attestation evidence within a certificate extension
+    * CA-signed certificate with limited attestation results in an
+    extension (e.g., ACME Device Attestation): remote attestation is
+    performed between the CA and attester prior to issuance, after which
+    the CA adds an extension indicating that the certificate key has
+    fulfilled some verification policy
+    * The DICE specification defines certificates that include attestation
+    information. At the time of writing, it is not clear whether and how
+    these certificates can be used within TLS.
+3. X.509 certificates alongside PAT: a keypair with a corresponding
+   certificate already exists and the owner wishes to continue using it,
+   while also enhancing the handshake to provide verifiable metadata
+   regarding the platform running the workload
+  * no cryptographic linking is used between certificate and PAT
+  * this approach is currently not addressed in this document
+4. X.509 certificates alongside PAT and KAT: similar to (3), with the
+   addition of key attestation meant to offer verifiable metadata regarding
+   the key identified by the certificate
+  * this implies that the TLS identity key must have been generated and
+    stored securely by an attested platform
+  * unlike (3), the certificate, KAT, and PAT must be cryptographically
+    linked together
+  * this approach is currently not addressed in this document
+5. Combined PAT/KAT: one attestation token carries metadata pertaining to
+   both platform and key, without explicit support from the attester for a
+   standard TLS identity
+  * this approach is currently not addressed in this document
+6. PAT alongside KAT: identical to (5), apart from the fact that the key
+   and platform attestations are separate tokens, cryptographically linked
+   together
+  * this approach is discussed in this document as the Combined Attestation
+    Bundle
+
 # History
 
 RFC EDITOR: PLEASE REMOVE THIS SECTION
