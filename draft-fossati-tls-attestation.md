@@ -22,6 +22,9 @@ pi:
   text-list-symbols: -o*+
   docmapping: yes
 
+venue:
+  github: yaronf/draft-tls-attestation
+
 author:
  -
        ins: H. Tschofenig
