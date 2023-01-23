@@ -817,9 +817,9 @@ possible:
     * Explicit signalling via existing methods, e.g. using a policy OID in
       the end-entity certificate.
     * Implicit signalling, e.g. via the issuer name.
-3. X.509 certificates alongside a PAT: This use case assumees that a
-    keypair with a corresponding certificate already exists and that the
-    owner wishes to continue using it. As a consequence, there is no
+3. X.509 certificates alongside a PAT: This use case assumes that a keypair
+    with a corresponding certificate already exists and that the owner
+    wishes to continue using it. As a consequence, there is no
     cryptographic linkage between the certificate and the PAT. This
     approach is currently not supported by this specification.
 4. X.509 certificates alongside the PAT and KAT: The addition of key
