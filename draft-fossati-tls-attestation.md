@@ -782,7 +782,7 @@ registry {{TLS-Ext-Registry}}, as follows:
 
 --- back
 
-# Design Rational: X.509 and Attestation Usage Variants
+# Design Rationale: X.509 and Attestation Usage Variants
 
 The inclusion of attestation results and evidence as part of the TLS
 handshake offers the relying party information about the state of the
@@ -803,18 +803,20 @@ possible:
     certificates in the Certificate message carry attestation as part of
     the X.509 certificate extensions. Several proposals exist that enable
     this functionality: 
-    * Attester-issued certificates with attestation evidence in an
-    extension (e.g., RA-TLS {{RA-TLS}}): The attester acts as a
-    certification authority (CA) and includes the attestation evidence
-    within the X.509 certificate extension.
-    * Third party CA-issued certificates with attestation in an extension
-    (e.g., ACME Device Attestation {{I-D.acme-device-attest}}): Remote
-    attestation is performed between the third party CA and the attester
-    prior to certificate issuance, after which the CA adds an extension
-    indicating that the certificate key has fulfilled some verification
-    policy.
-    * The DICE specification {{DICE-Attestation}} defines certificates that
-    include attestation information.
+    * Custom X.509 extension:
+      * Attester-issued certificates (e.g., RA-TLS {{RA-TLS}}): The
+      attester acts as a certification authority (CA) and includes the
+      attestation evidence within an X.509 extension.
+      * The DICE specification {{DICE-Attestation}} defines certificates
+      that include attestation information in the CA chain of certificates.
+      * Third party CA-issued certificates (e.g., ACME Device Attestation
+      {{I-D.acme-device-attest}}): Remote attestation is performed between
+      the third party CA and the attester prior to certificate issuance,
+      after which the CA adds an extension indicating that the certificate
+      key has fulfilled some verification policy.
+    * Explicit signalling via existing methods, e.g. using a policy OID in
+      the end-entity certificate.
+    * Implicit signalling, e.g. via the issuer name.
 3. X.509 certificates alongside a PAT: This use case assumees that a
     keypair with a corresponding certificate already exists and that the
     owner wishes to continue using it. As a consequence, there is no
@@ -832,7 +834,8 @@ possible:
 6. PAT alongside KAT: This variant is similar to (5) with the exception
     that the key and the platform attestations are stored in separate
     tokens, cryptographically linked together. This approach is covered by
-    this document as detailed in {{I-D.bft-rats-kat}}.
+    this document. A possible instantiation of the KAT is described in
+    {{I-D.bft-rats-kat}}.
 
 
 # History
