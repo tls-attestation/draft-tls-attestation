@@ -101,13 +101,13 @@ informative:
         ins: M. Vij
         name: Mona Vij
     date: January 2018
-  DICE-Attestation:
-    target: https://trustedcomputinggroup.org/resource/dice-attestation-architecture/
-    title: DICE Attestation Architecture Version 1.00 Revision 0.23
+  DICE-Layering:
+    target: https://trustedcomputinggroup.org/resource/dice-layering-architecture/
+    title: DICE Layering Architecture Version 1.00 Revision 0.19
     author:
       -
         org: Trusted Computing Group
-    date: March 2021
+    date: July 2020
 
 --- abstract
 
@@ -807,8 +807,8 @@ possible:
       * Attester-issued certificates (e.g., RA-TLS {{RA-TLS}}): The
       attester acts as a certification authority (CA) and includes the
       attestation evidence within an X.509 extension.
-      * The DICE specification {{DICE-Attestation}} defines certificates
-      that include attestation information in the CA chain of certificates.
+      * DICE defines extensions that include attestation information in
+      the "Embedded CA" certificates (See Section 8.1.1.1 of {{DICE-Layering}}).
       * Third party CA-issued certificates (e.g., ACME Device Attestation
       {{I-D.acme-device-attest}}): Remote attestation is performed between
       the third party CA and the attester prior to certificate issuance,
