@@ -80,6 +80,37 @@ informative:
   I-D.ietf-rats-architecture:
   TLS-Ext-Registry: IANA.tls-extensiontype-values
   TLS-Param-Registry: IANA.tls-parameters
+  I-D.acme-device-attest:
+  RA-TLS:
+    target: https://arxiv.org/abs/1801.05863
+    title: Integrating Remote Attestation with Transport Layer Security
+    author:
+       -
+        ins: T. Knauth
+        name: Thomas Knauth
+       -
+        ins: M. Steiner
+        name: Michael Steiner
+       -
+        ins: S. Chakrabarti
+        name: Somnath Chakrabarti
+       -
+        ins: L. Lei
+        name: Li Lei
+       -
+        ins: C. Xing
+        name: Cedric Xing
+       -
+        ins: M. Vij
+        name: Mona Vij
+    date: January 2018
+  DICE-Layering:
+    target: https://trustedcomputinggroup.org/resource/dice-layering-architecture/
+    title: DICE Layering Architecture Version 1.00 Revision 0.19
+    author:
+      -
+        org: Trusted Computing Group
+    date: July 2020
 
 --- abstract
 
@@ -753,6 +784,62 @@ registry {{TLS-Ext-Registry}}, as follows:
 -   Reference: [This document]
 
 --- back
+
+# Design Rationale: X.509 and Attestation Usage Variants
+
+The inclusion of attestation results and evidence as part of the TLS
+handshake offers the relying party information about the state of the
+system and its cryptographic keys, but lacks the means to specify a stable
+endpoint identifier. While it is possible to solve this problem by
+including an identifier as part of the attestation result, some use cases
+require the use of a public key infrastructure (PKI). It is therefore
+important to consider the possible approaches for conveying X.509
+certificates and attestation within a single handshake.
+
+In general, the following combinations of X.509 and attestation usage are
+possible:
+
+1. X.509 certificates only: In this case no attestation is exchanged in the
+    TLS handshake. Authentication relies on PKI alone, i.e. TLS with X.509
+    certificates.
+2. X.509 certificates containing attestation extension: The X.509
+    certificates in the Certificate message carry attestation as part of
+    the X.509 certificate extensions. Several proposals exist that enable
+    this functionality: 
+    * Custom X.509 extension:
+      * Attester-issued certificates (e.g., RA-TLS {{RA-TLS}}): The
+      attester acts as a certification authority (CA) and includes the
+      attestation evidence within an X.509 extension.
+      * DICE defines extensions that include attestation information in
+      the "Embedded CA" certificates (See Section 8.1.1.1 of {{DICE-Layering}}).
+      * Third party CA-issued certificates (e.g., ACME Device Attestation
+      {{I-D.acme-device-attest}}): Remote attestation is performed between
+      the third party CA and the attester prior to certificate issuance,
+      after which the CA adds an extension indicating that the certificate
+      key has fulfilled some verification policy.
+    * Explicit signalling via existing methods, e.g. using a policy OID in
+      the end-entity certificate.
+    * Implicit signalling, e.g. via the issuer name.
+3. X.509 certificates alongside a PAT: This use case assumes that a keypair
+    with a corresponding certificate already exists and that the owner
+    wishes to continue using it. As a consequence, there is no
+    cryptographic linkage between the certificate and the PAT. This
+    approach is currently not supported by this specification.
+4. X.509 certificates alongside the PAT and KAT: The addition of key
+    attestation implies that the TLS identity key must have been generated
+    and stored securely by the attested platform. Unlike in variant (3),
+    the certificate, the KAT, and the PAT must be cryptographically linked.
+    This variant is currently not addressed in this document.
+5. Combined PAT/KAT: With this variant the attestation token carries
+    information pertaining to both platform and key. No X.509 certificate
+    is transmitted during the handshake. This approach is currently not
+    addressed in this document.
+6. PAT alongside KAT: This variant is similar to (5) with the exception
+    that the key and the platform attestations are stored in separate
+    tokens, cryptographically linked together. This approach is covered by
+    this document. A possible instantiation of the KAT is described in
+    {{I-D.bft-rats-kat}}.
+
 
 # History
 
