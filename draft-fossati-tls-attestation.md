@@ -1,7 +1,7 @@
 ---
 title: Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)
 abbrev: Attestation in TLS/DTLS
-docname: draft-fossati-tls-attestation-02
+docname: draft-fossati-tls-attestation-03
 category: std
 
 ipr: trust200902
@@ -29,14 +29,13 @@ author:
  -
        ins: H. Tschofenig
        name: Hannes Tschofenig
-       organization: Arm Limited
-       email: hannes.tschofenig@arm.com
+       email: hannes.tschofenig@gmx.net
 
  -
-       ins: T. Fossati
-       name: Thomas Fossati
-       organization: Arm Limited
-       email: Thomas.Fossati@arm.com
+       ins: Y. Sheffer
+       name: Yaron Sheffer
+       organization: Intuit
+       email: yaronf.ietf@gmail.com
 
  -
        ins: P. Howard
@@ -304,7 +303,7 @@ Auth | {CertificateVerify}
 ~~~~
 {: #figure-background-check-model2 title="TLS Client Providing Evidence to TLS Server."}
 
-# Evidence Extension (Background Check Model)
+# Evidence Extensions (Background Check Model)
 
 This document defines two new extensions, the evidence_request and 
 the evidence_proposal, for use with the background check model. 
@@ -315,11 +314,18 @@ while the content format uses a number. The former is more
 flexible and does not necessarily require a registration 
 through IANA while the latter is more efficient over-the-wire.
 
+The EvidenceType structure also contains an indicator for the type of credential
+expected in the Certificate message. The credential can either contain
+attestation evidence alone, or an X.509 certificate alongside attestation
+evidence.
+
 ~~~~
    enum { NUMERIC(0), STRING(1) } encodingType;
+   enum { ATTESTATION(0), CERT_ATTESTATION(1) } credentialType;
 
    struct {
         encodingType type;
+        credentialType cred_type;
         select (encodingType) {
             case NUMERIC:
               uint16 content_format;
@@ -352,8 +358,12 @@ through IANA while the latter is more efficient over-the-wire.
 ~~~~
 {: #figure-attestation-type title="TLS Structure for Evidence."}
 
-The Certificate payload is used as a container, as shown in 
-{{figure-certificate}}, and follows the model of {{RFC8446}}.
+## Attestation-only {#attest-only}
+
+When the chosen evidence type indicates the sole use of attestation for
+authentication, the Certificate payload is used as a container for
+attestation evidence, as shown in {{figure-attest-only}}, and follows the
+model of {{RFC8446}}.
 
 ~~~~
       struct {
@@ -377,10 +387,87 @@ The Certificate payload is used as a container, as shown in
           CertificateEntry certificate_list<0..2^24-1>;
       } Certificate;
 ~~~~
-{: #figure-certificate title="Certificate Message."}
+{: #figure-attest-only title="Certificate Message when using only attestation."}
 
 The encoding of the evidence structure is defined in
 {{I-D.ftbs-rats-msg-wrap}}.
+
+## Attestation alongside X.509 certificates {#pkix-attest}
+
+When the chosen evidence type indicates usage of both attestation and PKIX,
+the X.509 certificate will serve as the main payload in the Certificate
+message, while the attestation evidence will be carried in the
+CertificateEntry extension, as shown in {{figure-cert-attest}}.
+
+~~~~
+      struct {
+          select (certificate_type) {
+              case RawPublicKey:
+                /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
+                opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
+              
+              /* X.509 certificate conveyed as usual */
+              case X509:
+                opaque cert_data<1..2^24-1>;
+          };
+          /* attestation evidence conveyed as an extension, see below */
+          Extension extensions<0..2^16-1>;
+      } CertificateEntry;
+
+      struct {
+        opaque certificate_request_context<0..2^8-1>;
+        CertificateEntry certificate_list<0..2^24-1>;
+      } Certificate;
+
+      struct {
+        ExtensionType extension_type;
+        /* payload used to convey evidence */
+        opaque extension_data<0..2^16-1>;
+      } Extension;
+
+      enum {
+        /* other extension types defined in the IANA TLS 
+            ExtensionType Value registry */
+
+        /* variant used to identify attestation evidence */
+        attestation_evidence(60),
+        (65535)
+      } ExtensionType;
+~~~~
+{: #figure-cert-attest title="Certificate Message when using PKIX and attestation."}
+
+The encoding of the evidence structure is defined in
+{{I-D.ftbs-rats-msg-wrap}}.
+
+As described in {{usage-variants}}, this authentication mechanism is meant
+primarily for carrying platform attestation evidence to provide more
+context to the relying party. This evidence must be cryptographically bound
+to the TLS handshake to prevent relay attacks. An Attestation Channel Binder as
+described in {{binding-mech}} is therefore used when the attestation scheme
+does not allow the binding data to be part of the token. The structure of
+the binder is given in {{figure-tls-binder}}.
+
+~~~~
+attestation_channel_binder = {
+  &(nonce: 1) => bstr .size (8..64)
+  &(ik_pub_fingerprint: 2) => bstr .size (16..64)
+  &(channel_binder: 3) => bstr .size (16..64)
+}
+~~~~
+{: #figure-tls-binder title="Format of TLS channel binder."}
+
+* Nonce is the value provided as a challenge by the relying party.
+* The identity key public fingerprint (ik_pub_fingerprint) is a hash of the
+  Subject Public Key Info from the leaf X.509 certificate transmitted in
+  the handshake.
+* The channel binder (channel_binder) is a partial transcript of the TLS
+  handshake, up to (but not including) the Certificate message.
+
+A hash of the binder must be included in the attestation evidence. Previous
+to hashing, the binder must be encoded as described in {{binding-mech}}.
+
+The hash algorithm negotiatied within the handshake must be used wherever
+hashing is required for the binder.
 
 # TLS Client and Server Handshake Behavior {#behavior}
 
@@ -785,7 +872,7 @@ registry {{TLS-Ext-Registry}}, as follows:
 
 --- back
 
-# Design Rationale: X.509 and Attestation Usage Variants
+# Design Rationale: X.509 and Attestation Usage Variants {#usage-variants}
 
 The inclusion of attestation results and evidence as part of the TLS
 handshake offers the relying party information about the state of the
@@ -824,7 +911,7 @@ possible:
     with a corresponding certificate already exists and that the owner
     wishes to continue using it. As a consequence, there is no
     cryptographic linkage between the certificate and the PAT. This
-    approach is currently not supported by this specification.
+    approach is described in {{pkix-attest}}.
 4. X.509 certificates alongside the PAT and KAT: The addition of key
     attestation implies that the TLS identity key must have been generated
     and stored securely by the attested platform. Unlike in variant (3),
@@ -837,9 +924,86 @@ possible:
 6. PAT alongside KAT: This variant is similar to (5) with the exception
     that the key and the platform attestations are stored in separate
     tokens, cryptographically linked together. This approach is covered by
-    this document. A possible instantiation of the KAT is described in
-    {{I-D.bft-rats-kat}}.
+    this document in {{attest-only}}. A possible instantiation of the KAT
+    is described in {{I-D.bft-rats-kat}}.
 
+
+# Cross-protocol binding mechanism {#binding-mech}
+
+Note: This section describes a protocol-agnostic mechanism which is used in
+the context of TLS within the body of the draft. The mechanism might, in
+the future, be spun out into its own document.
+
+One of the issues that must be addressed when using remote attestation as
+an authentication mechanism is the binding to the outer protocol (i.e., the
+protocol requiring authentication). For every instance of the combined
+protocol, the remote attestation credentials must be verifiably linked to
+the outer protocol. The main reason for this requirement is security: a
+lack of binding can result in the attestation credentials being relayed.
+
+If the attestation credentials can be enhanced freely and in a verifiable
+way, the binding can be performed by inserting the relevant data as new
+claims. If the ways of enhancing the credentials are more restricted,
+ad-hoc solutions can be devised which address the issue. For example, many
+roots of trust only allow a small amount (32-64 bytes) of user-provided
+data which will be included in the attestation token. If more data must be
+included, it must therefore be compressed. In this case, the problem is
+compounded by the need to also include a challenge value coming from the
+relying party. The verification steps also become more complex, as the
+binding data must be returned from the verifier and checked by the relying
+party.
+
+However, regardless of how the binding and verification are performed,
+similar but distinct approaches need to be taken for every protocol into
+which remote attestation is embedded, as the type or semantics of the
+binding data could differ. A more standardised way of tackling this issue
+would therefore be beneficial. This appendix presents a solution to this
+problem, in the context of attestation evidence.
+
+## Binding mechanism
+
+The core of the binding mechanism consists of a new token format - the
+Attestation Channel Binder - that represents a set of binders as a CBOR
+map. Binders are individual pieces of data with an unambiguous definition.
+Each binder is a name/value pair, where the name must be an integer and the
+value must be a byte string.
+
+Each protocol using the Attestation Channel Binder to bind attestation
+credentials must define its Attestation Channel Binder using CDDL. The only
+mandated binder is the challenger nonce which must use the value 1 as a
+name. Every other name/value pair must come with a text description of its
+semantics. The byte strings forming the values of binders can be
+size-restricted where this value is known.
+
+Attestation Channel Binders are encoded in CBOR, following the CBOR core
+deterministic encoding requirements ({{Section 4.2.1 of !RFC8949}}).
+
+An example Attestation Channel Binder is shown below.
+
+~~~~
+attestation_channel_binder = {
+  &(nonce: 1) => bstr .size (8..64)
+  &(ik_pub_fingerprint: 2) => bstr .size 32
+  &(session_key_binder: 3) => bstr .size 32
+}
+~~~~
+{: #figure-binder-format title="Format of a possible TLS Attestation Channel Binder."}
+
+## Usage
+
+When a Attestation Channel Binder is used to compress data to fit the space
+afforded by an attestation scheme, the encoded binder must be hashed. Since
+the relying party has access to all the data expected in the binder, the
+binder itself need not be conveyed. How the hashing algorithm is chosen,
+used, and conveyed must be defined per outer protocol. If the digest size
+does not match the user data size mandated by the attestation scheme, the
+digest is truncated or expanded appropriately.
+
+The verifier must first hash the encoded token received from the relying
+party and then compare the hashes. The challenge value included in the
+binder can then be extracted and verified. If verification is successful,
+binder correctness can also be assumed by the relying party, as
+verification was done with the values it expected.
 
 # History
 
