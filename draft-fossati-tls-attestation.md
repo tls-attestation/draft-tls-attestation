@@ -415,8 +415,8 @@ CertificateEntry extension, as shown in {{figure-cert-attest}}.
       } CertificateEntry;
 
       struct {
-          opaque certificate_request_context<0..2^8-1>;
-          CertificateEntry certificate_list<0..2^24-1>;
+        opaque certificate_request_context<0..2^8-1>;
+        CertificateEntry certificate_list<0..2^24-1>;
       } Certificate;
 
       struct {
@@ -426,14 +426,15 @@ CertificateEntry extension, as shown in {{figure-cert-attest}}.
       } Extension;
 
       enum {
-        /* other extension types defined in the IANA TLS ExtensionType Value registry */
+        /* other extension types defined in the IANA TLS 
+            ExtensionType Value registry */
 
         /* variant used to identify attestation evidence */
         attestation_evidence(60),
         (65535)
       } ExtensionType;
 ~~~~
-{: #figure-cert attest title="Certificate Message when using PKIX and attestation."}
+{: #figure-cert-attest title="Certificate Message when using PKIX and attestation."}
 
 The encoding of the evidence structure is defined in
 {{I-D.ftbs-rats-msg-wrap}}.
@@ -441,7 +442,7 @@ The encoding of the evidence structure is defined in
 As described in {{usage-variants}}, this authentication mechanism is meant
 primarily for carrying platform attestation evidence to provide more
 context to the relying party. This evidence must be cryptographically bound
-to the TLS handshake to prevent relay attacks. A Binder Collection as
+to the TLS handshake to prevent relay attacks. An Attestation Channel Binder as
 described in {{binding-mech}} is therefore used when the attestation scheme
 does not allow the binding data to be part of the token. The structure of
 the collection is given in {{figure-tls-binder}}.
@@ -449,11 +450,11 @@ the collection is given in {{figure-tls-binder}}.
 ~~~~
 binder_collection = {
   &(nonce: 1) => bstr .size (8..64)
-  &(ik_pub_fingerprint: 2) => bstr .size 32
-  &(channel_binder: 3) => bstr .size 32
+  &(ik_pub_fingerprint: 2) => bstr .size (16..64)
+  &(channel_binder: 3) => bstr .size (16..64)
 }
 ~~~~
-{: #figure-tls-binder title="Format of TLS Binder Collection."}
+{: #figure-tls-binder title="Format of TLS channel binder."}
 
 * Nonce is the value provided as a challenge by the relying party.
 * The identity key public fingerprint (ik_pub_fingerprint) is a hash of the
@@ -462,7 +463,8 @@ binder_collection = {
 * The channel binder (channel_binder) is a partial transcript of the TLS
   handshake, up to (but not including) the Certificate message.
 
-A hash of the encoded binder must be included in the attestation evidence.
+A hash of the binder must be included in the attestation evidence. Previous
+to hashing, the binder must be encoded as described in {{binding-mech}}.
 
 The hash algorithm negotiatied within the handshake must be used wherever
 hashing is required for the binder.
@@ -928,6 +930,10 @@ possible:
 
 # Cross-protocol binding mechanism {#binding-mech}
 
+Note: This section describes a protocol-agnostic mechanism which is used in
+the context of TLS within the body of the draft. The mechanism might, in
+the future, be spun out into its own document.
+
 One of the issues that must be addressed when using remote attestation as
 an authentication mechanism is the binding to the outer protocol (i.e., the
 protocol requiring authentication). For every instance of the combined
@@ -957,22 +963,22 @@ problem, in the context of attestation evidence.
 ## Binding mechanism
 
 The core of the binding mechanism consists of a new token format - the
-Binder Collection - that represents a set of binders as a CBOR map. Binders
-are individual pieces of data with an unambiguous definition. Each binder
-is a name/value pair, where the name must be an integer and the value must
-be a byte string.
+Attestation Channel Binder - that represents a set of binders as a CBOR
+map. Binders are individual pieces of data with an unambiguous definition.
+Each binder is a name/value pair, where the name must be an integer and the
+value must be a byte string.
 
-Each protocol using the Binder Collection to bind attestation credentials
-must define its Binder Collection using CDDL. The only mandated binder is
-the challenger nonce which must use the value 1 as a name. Every other
-name/value pair must come with a text description of its semantics. The
-byte strings forming the values of binders can be size-restricted where
-this value is known.
+Each protocol using the Attestation Channel Binder to bind attestation
+credentials must define its Attestation Channel Binder using CDDL. The only
+mandated binder is the challenger nonce which must use the value 1 as a
+name. Every other name/value pair must come with a text description of its
+semantics. The byte strings forming the values of binders can be
+size-restricted where this value is known.
 
-Binder Collections are encoded in CBOR, following the CBOR core
-deterministic encoding requirements.
+Attestation Channel Binders are encoded in CBOR, following the CBOR core
+deterministic encoding requirements ({{Section 4.2.1 of !RFC8949}}).
 
-An example Binder Collection is shown below.
+An example Attestation Channel Binder is shown below.
 
 ~~~~
 binder_collection = {
@@ -981,15 +987,17 @@ binder_collection = {
   &(session_key_binder: 3) => bstr .size 32
 }
 ~~~~
-{: #figure-binder-format title="Format of a possible TLS Binder Collection."}
+{: #figure-binder-format title="Format of a possible TLS Attestation Channel Binder."}
 
 ## Usage
 
-When a Binder Collection is used to compress data to fit the space afforded
-by an attestation scheme, the encoded binder must be hashed. Since the
-relying party has access to all the data expected in the binder, the binder
-itself need not be conveyed. How the hashing algorithm is chosen and
-conveyed must be defined per outer protocol.
+When a Attestation Channel Binder is used to compress data to fit the space
+afforded by an attestation scheme, the encoded binder must be hashed. Since
+the relying party has access to all the data expected in the binder, the
+binder itself need not be conveyed. How the hashing algorithm is chosen,
+used, and conveyed must be defined per outer protocol. If the digest size
+does not match the user data size mandated by the attestation scheme, the
+digest is truncated or expanded appropriately.
 
 The verifier must first hash the encoded token received from the relying
 party and then compare the hashes. The challenge value included in the
