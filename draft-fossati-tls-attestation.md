@@ -34,6 +34,7 @@ author:
  -
        ins: Y. Sheffer
        name: Yaron Sheffer
+       organization: Intuit
        email: yaronf.ietf@gmail.com
 
  -
@@ -357,7 +358,7 @@ evidence.
 ~~~~
 {: #figure-attestation-type title="TLS Structure for Evidence."}
 
-## Attestation-only
+## Attestation-only {#attest-only}
 
 When the chosen evidence type indicates the sole use of attestation for
 authentication, the Certificate payload is used as a container for attestation
@@ -391,7 +392,7 @@ evidence, as shown in {{figure-attest-only}}, and follows the model of
 The encoding of the evidence structure is defined in
 {{I-D.ftbs-rats-msg-wrap}}.
 
-## Attestation alongside X.509 certificates
+## Attestation alongside X.509 certificates {#pkix-attest}
 
 When the chosen evidence type indicates usage of both attestation and PKIX, the
 X.509 certificate will serve as the main payload in the Certificate message,
@@ -404,15 +405,12 @@ extension, as shown in {{figure-cert-attest}}.
               case RawPublicKey:
                 /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
                 opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
-
-              case attestation:
-                opaque evidence<1..2^24-1>;
               
               /* X.509 certificate conveyed as usual */
               case X509:
                 opaque cert_data<1..2^24-1>;
           };
-          /* attestation evidence conveyed as an extension */
+          /* attestation evidence conveyed as an extension, see below */
           Extension extensions<0..2^16-1>;
       } CertificateEntry;
 
@@ -420,19 +418,33 @@ extension, as shown in {{figure-cert-attest}}.
           opaque certificate_request_context<0..2^8-1>;
           CertificateEntry certificate_list<0..2^24-1>;
       } Certificate;
+
+      struct {
+        ExtensionType extension_type;
+        /* payload used to convey evidence */
+        opaque extension_data<0..2^16-1>;
+      } Extension;
+
+      enum {
+        /* other extension types defined in the IANA TLS ExtensionType Value registry */
+
+        /* variant used to identify attestation evidence */
+        attestation_evidence(60),
+        (65535)
+      } ExtensionType;
 ~~~~
 {: #figure-cert attest title="Certificate Message when using PKIX and attestation."}
 
 The encoding of the evidence structure is defined in
 {{I-D.ftbs-rats-msg-wrap}}.
 
-As described in Appendix A, this authentication mechanism is meant primarily for
-carrying platform attestation evidence to provide more context to the relying
-party. This evidence must be cryptographically bound to the TLS handshake to
-prevent relay attacks. A Binder Collection as described in Appendix B is
-therefore used when the attestation scheme does not allow the binding data to be
-part of the token. The structure of the collection is given in
-{{figure-tls-binder}}.
+As described in {{usage-variants}}, this authentication mechanism is meant
+primarily for carrying platform attestation evidence to provide more
+context to the relying party. This evidence must be cryptographically bound
+to the TLS handshake to prevent relay attacks. A Binder Collection as
+described in {{binding-mech}} is therefore used when the attestation scheme
+does not allow the binding data to be part of the token. The structure of
+the collection is given in {{figure-tls-binder}}.
 
 ~~~~
 binder_collection = {
@@ -444,15 +456,17 @@ binder_collection = {
 {: #figure-tls-binder title="Format of TLS Binder Collection."}
 
 * Nonce is the value provided as a challenge by the relying party.
-* The identity key public fingerprint (ik_pub_fingerprint) is a SHA256 hash of
+* The identity key public fingerprint (ik_pub_fingerprint) is a hash of
   the Subject Public Key Info from the leaf X.509 certificate transmitted in the
   handshake.
 * The channel binder (channel_binder) is a partial transcript of the TLS
   handshake, up to (but not including) the Certificate message.
 
-A SHA256 digest of the encoded binder must be included in the attestation
+A hash of the encoded binder must be included in the attestation
 evidence.
 
+The hash algorithm negotiatied within the handshake must be used wherever
+hashing is required for the binder.
 
 # TLS Client and Server Handshake Behavior {#behavior}
 
@@ -857,7 +871,7 @@ registry {{TLS-Ext-Registry}}, as follows:
 
 --- back
 
-# Design Rationale: X.509 and Attestation Usage Variants
+# Design Rationale: X.509 and Attestation Usage Variants {#usage-variants}
 
 The inclusion of attestation results and evidence as part of the TLS
 handshake offers the relying party information about the state of the
@@ -896,7 +910,7 @@ possible:
     with a corresponding certificate already exists and that the owner
     wishes to continue using it. As a consequence, there is no
     cryptographic linkage between the certificate and the PAT. This
-    approach is currently not supported by this specification.
+    approach is described in {{pkix-attest}}.
 4. X.509 certificates alongside the PAT and KAT: The addition of key
     attestation implies that the TLS identity key must have been generated
     and stored securely by the attested platform. Unlike in variant (3),
@@ -909,11 +923,11 @@ possible:
 6. PAT alongside KAT: This variant is similar to (5) with the exception
     that the key and the platform attestations are stored in separate
     tokens, cryptographically linked together. This approach is covered by
-    this document. A possible instantiation of the KAT is described in
-    {{I-D.bft-rats-kat}}.
+    this document in {{attest-only}}. A possible instantiation of the KAT
+    is described in {{I-D.bft-rats-kat}}.
 
 
-# Cross-protocol binding mechanism
+# Cross-protocol binding mechanism {#binding-mech}
 
 One of the issues that must be addressed when using remote attestation as an
 authentication mechanism is the binding to the outer protocol (i.e., the
