@@ -361,9 +361,9 @@ evidence.
 ## Attestation-only {#attest-only}
 
 When the chosen evidence type indicates the sole use of attestation for
-authentication, the Certificate payload is used as a container for attestation
-evidence, as shown in {{figure-attest-only}}, and follows the model of
-{{RFC8446}}.
+authentication, the Certificate payload is used as a container for
+attestation evidence, as shown in {{figure-attest-only}}, and follows the
+model of {{RFC8446}}.
 
 ~~~~
       struct {
@@ -394,10 +394,10 @@ The encoding of the evidence structure is defined in
 
 ## Attestation alongside X.509 certificates {#pkix-attest}
 
-When the chosen evidence type indicates usage of both attestation and PKIX, the
-X.509 certificate will serve as the main payload in the Certificate message,
-while the attestation evidence will be carried in the CertificateEntry
-extension, as shown in {{figure-cert-attest}}.
+When the chosen evidence type indicates usage of both attestation and PKIX,
+the X.509 certificate will serve as the main payload in the Certificate
+message, while the attestation evidence will be carried in the
+CertificateEntry extension, as shown in {{figure-cert-attest}}.
 
 ~~~~
       struct {
@@ -456,14 +456,13 @@ binder_collection = {
 {: #figure-tls-binder title="Format of TLS Binder Collection."}
 
 * Nonce is the value provided as a challenge by the relying party.
-* The identity key public fingerprint (ik_pub_fingerprint) is a hash of
-  the Subject Public Key Info from the leaf X.509 certificate transmitted in the
-  handshake.
+* The identity key public fingerprint (ik_pub_fingerprint) is a hash of the
+  Subject Public Key Info from the leaf X.509 certificate transmitted in
+  the handshake.
 * The channel binder (channel_binder) is a partial transcript of the TLS
   handshake, up to (but not including) the Certificate message.
 
-A hash of the encoded binder must be included in the attestation
-evidence.
+A hash of the encoded binder must be included in the attestation evidence.
 
 The hash algorithm negotiatied within the handshake must be used wherever
 hashing is required for the binder.
@@ -929,47 +928,49 @@ possible:
 
 # Cross-protocol binding mechanism {#binding-mech}
 
-One of the issues that must be addressed when using remote attestation as an
-authentication mechanism is the binding to the outer protocol (i.e., the
-protocol requiring authentication). For every instance of the combined protocol,
-the remote attestation credentials must be verifiably linked to the outer
-protocol. The main reason for this requirement is security: a lack of binding
-can result in the attestation credentials being relayed.
+One of the issues that must be addressed when using remote attestation as
+an authentication mechanism is the binding to the outer protocol (i.e., the
+protocol requiring authentication). For every instance of the combined
+protocol, the remote attestation credentials must be verifiably linked to
+the outer protocol. The main reason for this requirement is security: a
+lack of binding can result in the attestation credentials being relayed.
 
-If the attestation credentials can be enhanced freely and in a verifiable way,
-the binding can be performed by inserting the relevant data as new claims. If
-the ways of enhancing the credentials are more restricted, ad-hoc solutions can
-be devised which address the issue. For example, many roots of trust only allow
-a small amount (32-64 bytes) of user-provided data which will be included in the
-attestation token. If more data must be included, it must therefore be
-compressed. In this case, the problem is compounded by the need to also include
-a challenge value coming from the relying party. The verification steps also
-become more complex, as the binding data must be returned from the verifier and
-checked by the relying party.
+If the attestation credentials can be enhanced freely and in a verifiable
+way, the binding can be performed by inserting the relevant data as new
+claims. If the ways of enhancing the credentials are more restricted,
+ad-hoc solutions can be devised which address the issue. For example, many
+roots of trust only allow a small amount (32-64 bytes) of user-provided
+data which will be included in the attestation token. If more data must be
+included, it must therefore be compressed. In this case, the problem is
+compounded by the need to also include a challenge value coming from the
+relying party. The verification steps also become more complex, as the
+binding data must be returned from the verifier and checked by the relying
+party.
 
-However, regardless of how the binding and verification are performed, similar
-but distinct approaches need to be taken for every protocol into which remote
-attestation is embedded, as the type or semantics of the binding data could
-differ. A more standardised way of tackling this issue would therefore be
-beneficial. This appendix presents a solution to this problem, in the context of
-attestation evidence.
+However, regardless of how the binding and verification are performed,
+similar but distinct approaches need to be taken for every protocol into
+which remote attestation is embedded, as the type or semantics of the
+binding data could differ. A more standardised way of tackling this issue
+would therefore be beneficial. This appendix presents a solution to this
+problem, in the context of attestation evidence.
 
 ## Binding mechanism
 
-The core of the binding mechanism consists of a new token format - the Binder
-Collection - that represents a set of binders as a CBOR map. Binders are
-individual pieces of data with an unambiguous definition. Each binder is a
-name/value pair, where the name must be an integer and the value must be a byte
-string.
+The core of the binding mechanism consists of a new token format - the
+Binder Collection - that represents a set of binders as a CBOR map. Binders
+are individual pieces of data with an unambiguous definition. Each binder
+is a name/value pair, where the name must be an integer and the value must
+be a byte string.
 
-Each protocol using the Binder Collection to bind attestation credentials must
-define its Binder Collection using CDDL. The only mandated binder is the
-challenger nonce which must use the value 1 as a name. Every other name/value
-pair must come with a text description of its semantics. The byte strings
-forming the values of binders can be size-restricted where this value is known.
+Each protocol using the Binder Collection to bind attestation credentials
+must define its Binder Collection using CDDL. The only mandated binder is
+the challenger nonce which must use the value 1 as a name. Every other
+name/value pair must come with a text description of its semantics. The
+byte strings forming the values of binders can be size-restricted where
+this value is known.
 
-Binder Collections are encoded in CBOR, following the CBOR core deterministic
-encoding requirements.
+Binder Collections are encoded in CBOR, following the CBOR core
+deterministic encoding requirements.
 
 An example Binder Collection is shown below.
 
@@ -984,17 +985,17 @@ binder_collection = {
 
 ## Usage
 
-When a Binder Collection is used to compress data to fit the space afforded by
-an attestation scheme, the encoded binder must be hashed. Since the relying
-party has access to all the data expected in the binder, the binder itself need
-not be conveyed. How the hashing algorithm is chosen and conveyed must be
-defined per outer protocol.
+When a Binder Collection is used to compress data to fit the space afforded
+by an attestation scheme, the encoded binder must be hashed. Since the
+relying party has access to all the data expected in the binder, the binder
+itself need not be conveyed. How the hashing algorithm is chosen and
+conveyed must be defined per outer protocol.
 
-The verifier must first hash the encoded token received from the relying party
-and then compare the hashes. The challenge value included in the binder can then
-be extracted and verified. If verification is successful, binder correctness can
-also be assumed by the relying party, as verification was done with the values
-it expected.
+The verifier must first hash the encoded token received from the relying
+party and then compare the hashes. The challenge value included in the
+binder can then be extracted and verified. If verification is successful,
+binder correctness can also be assumed by the relying party, as
+verification was done with the values it expected.
 
 # History
 
