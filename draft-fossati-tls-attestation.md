@@ -445,10 +445,10 @@ context to the relying party. This evidence must be cryptographically bound
 to the TLS handshake to prevent relay attacks. An Attestation Channel Binder as
 described in {{binding-mech}} is therefore used when the attestation scheme
 does not allow the binding data to be part of the token. The structure of
-the collection is given in {{figure-tls-binder}}.
+the binder is given in {{figure-tls-binder}}.
 
 ~~~~
-binder_collection = {
+attestation_channel_binder = {
   &(nonce: 1) => bstr .size (8..64)
   &(ik_pub_fingerprint: 2) => bstr .size (16..64)
   &(channel_binder: 3) => bstr .size (16..64)
@@ -981,7 +981,7 @@ deterministic encoding requirements ({{Section 4.2.1 of !RFC8949}}).
 An example Attestation Channel Binder is shown below.
 
 ~~~~
-binder_collection = {
+attestation_channel_binder = {
   &(nonce: 1) => bstr .size (8..64)
   &(ik_pub_fingerprint: 2) => bstr .size 32
   &(session_key_binder: 3) => bstr .size 32
