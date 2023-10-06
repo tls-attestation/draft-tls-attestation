@@ -460,8 +460,11 @@ attestation_channel_binder = {
 * The identity key public fingerprint (ik_pub_fingerprint) is a hash of the
   Subject Public Key Info from the leaf X.509 certificate transmitted in
   the handshake.
-* The channel binder (channel_binder) is a partial transcript of the TLS
-  handshake, up to (but not including) the Certificate message.
+* The channel binder (channel_binder) is a value obtained from the early
+  exporter mechanism offered by the TLS implementation (see section 7.5 of
+  {{RFC8446}}). This Early Exporter Value (EEV) must be obtained immediately
+  following the ServerHello message, using 'attestation-binder' as the label
+  and an empty context.
 
 A hash of the binder must be included in the attestation evidence. Previous
 to hashing, the binder must be encoded as described in {{binding-mech}}.
