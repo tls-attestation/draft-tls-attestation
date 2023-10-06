@@ -149,6 +149,7 @@ The two models can be summarized as follows:
 This specification supports both patterns.
 
 Several formats for encoding evidence are available, such as:
+
 - the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}, 
 - the Trusted Platform Modules (TPMs) {{TPM1.2}} {{TPM2.0}},
 - the Android Key Attestation, and
@@ -218,18 +219,18 @@ of operation when used with TLS, namely:
 - TLS server is the attester, and
 - TLS client and server mutually attest towards each other. 
 
-We will show the message exchanges of the three cases in
-sub-sections below.
+We will show the message exchanges of the first two cases in sub-sections
+below. The last case will be described in future drafts.
 
 ## TLS Client as Attester 
 
-In this use case the TLS client, as the attester, is challenged by the TLS
-server to provide evidence. The TLS client is the attester and the the TLS
-server acts as a relying party. The TLS server needs to provide a nonce
-in the EncryptedExtensions message to the TLS client so that the attestation
-service can feed the nonce into the generation of the evidence. The TLS 
-server, when receiving the evidence, will have to contact the verifier 
-(which is not shown in the diagram). 
+In this use case, the TLS server (acting as a relying party) challenges the TLS
+client (as the attester) to provide evidence. The TLS client is the attester
+and the TLS server acts as a relying party. The TLS server needs to provide a
+nonce in the EncryptedExtensions message to the TLS client so that the
+attestation service can feed the nonce into the generation of the evidence. The
+TLS server, when receiving the evidence, will have to contact the verifier
+(which is not shown in the diagram).
 
 An example of this flow can be found in device onboarding where the 
 client initiates the communication with cloud infrastructure to 
@@ -301,7 +302,7 @@ Auth | {CertificateVerify}
      v {Finished}              -------->
        [Application Data]      <------->  [Application Data]
 ~~~~
-{: #figure-background-check-model2 title="TLS Client Providing Evidence to TLS Server."}
+{: #figure-background-check-model2 title="TLS Server Providing Evidence to TLS Client."}
 
 # Evidence Extensions (Background Check Model)
 
@@ -456,11 +457,11 @@ attestation_channel_binder = {
 ~~~~
 {: #figure-tls-binder title="Format of TLS channel binder."}
 
-* Nonce is the value provided as a challenge by the relying party.
-* The identity key public fingerprint (ik_pub_fingerprint) is a hash of the
+- Nonce is the value provided as a challenge by the relying party.
+- The identity key public fingerprint (ik_pub_fingerprint) is a hash of the
   Subject Public Key Info from the leaf X.509 certificate transmitted in
   the handshake.
-* The channel binder (channel_binder) is a value obtained from the early
+- The channel binder (channel_binder) is a value obtained from the early
   exporter mechanism offered by the TLS implementation (see section 7.5 of
   {{RFC8446}}). This Early Exporter Value (EEV) must be obtained immediately
   following the ServerHello message, using 'attestation-binder' as the label
@@ -603,8 +604,8 @@ for the computation, the consumer of the computed results, the party
 providing a proprietary ML model used in the computation) have two
 goals:
 
-* Identifying the workload they are interacting with,
-* Making sure that the platform on which the workload executes is a
+- Identifying the workload they are interacting with,
+- Making sure that the platform on which the workload executes is a
   Trusted Execution Environment (TEE) with the expected features.
 
 A convenient arrangement is to verify that the two requirements are met
@@ -896,20 +897,20 @@ possible:
     certificates in the Certificate message carry attestation as part of
     the X.509 certificate extensions. Several proposals exist that enable
     this functionality: 
-    * Custom X.509 extension:
-      * Attester-issued certificates (e.g., RA-TLS {{RA-TLS}}): The
+    - Custom X.509 extension:
+      - Attester-issued certificates (e.g., RA-TLS {{RA-TLS}}): The
       attester acts as a certification authority (CA) and includes the
       attestation evidence within an X.509 extension.
-      * DICE defines extensions that include attestation information in
+      - DICE defines extensions that include attestation information in
       the "Embedded CA" certificates (See Section 8.1.1.1 of {{DICE-Layering}}).
-      * Third party CA-issued certificates (e.g., ACME Device Attestation
+      - Third party CA-issued certificates (e.g., ACME Device Attestation
       {{I-D.acme-device-attest}}): Remote attestation is performed between
       the third party CA and the attester prior to certificate issuance,
       after which the CA adds an extension indicating that the certificate
       key has fulfilled some verification policy.
-    * Explicit signalling via existing methods, e.g. using a policy OID in
+    - Explicit signalling via existing methods, e.g. using a policy OID in
       the end-entity certificate.
-    * Implicit signalling, e.g. via the issuer name.
+    - Implicit signalling, e.g. via the issuer name.
 3. X.509 certificates alongside a PAT: This use case assumes that a keypair
     with a corresponding certificate already exists and that the owner
     wishes to continue using it. As a consequence, there is no
