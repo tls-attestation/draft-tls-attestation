@@ -219,14 +219,13 @@ of operation when used with TLS, namely:
 - TLS server is the attester, and
 - TLS client and server mutually attest towards each other. 
 
-We will show the message exchanges of the first two cases in sub-sections
-below. The last case will be described in future drafts.
+We will show the message exchanges of the first two cases in {{attester-cli}}
+and {{attester-srv}}. The last case is obtained by composing the first two.
 
-## TLS Client as Attester 
+## TLS Client as Attester {#attester-cli}
 
 In this use case, the TLS server (acting as a relying party) challenges the TLS
-client (as the attester) to provide evidence. The TLS client is the attester
-and the TLS server acts as a relying party. The TLS server needs to provide a
+client (as the attester) to provide evidence. The TLS server needs to provide a
 nonce in the EncryptedExtensions message to the TLS client so that the
 attestation service can feed the nonce into the generation of the evidence. The
 TLS server, when receiving the evidence, will have to contact the verifier
@@ -265,7 +264,7 @@ Auth | {CertificateVerify}
 {: #figure-background-check-model1 title="TLS Client Providing Evidence to TLS Server."}
 
 
-## TLS Server as Attester
+## TLS Server as Attester {#attester-srv}
 
 In this use case the TLS client challenges the TLS server to present evidence. 
 The TLS server acts as an attester while the TLS client is the relying party. 
@@ -458,14 +457,25 @@ attestation_channel_binder = {
 {: #figure-tls-binder title="Format of TLS channel binder."}
 
 - Nonce is the value provided as a challenge by the relying party.
-- The identity key public fingerprint (ik_pub_fingerprint) is a hash of the
+- The identity key fingerprint (ik_pub_fingerprint) is a hash of the
   Subject Public Key Info from the leaf X.509 certificate transmitted in
   the handshake.
 - The channel binder (channel_binder) is a value obtained from the early
-  exporter mechanism offered by the TLS implementation (see section 7.5 of
-  {{RFC8446}}). This Early Exporter Value (EEV) must be obtained immediately
-  following the ServerHello message, using 'attestation-binder' as the label
-  and an empty context.
+  exporter mechanism offered by the TLS implementation ({{Section 7.5 of
+  RFC8446}}). This Early Exporter Value (EEV) must be obtained immediately
+  following the ServerHello message, using 'attestation-binder' as the label,
+  an empty context, and with the key length set to 32 bytes.
+  {{figure-early-exporter}} shows this computation using the notation from
+  {{RFC8446}}.
+
+~~~~
+TLS-Early-Exporter(label, context_value, key_length) =
+       HKDF-Expand-Label(Derive-Secret(early_exporter_master_secret, label, ""),
+                         "exporter", Hash(context_value), key_length)
+
+channel_binder = TLS-Early-Exporter(label = "attestation-binder", context_value = "", key_length = 32)
+~~~~
+{: #figure-early-exporter title="Usage of TLS v1.3 early exporter for channel binding."}
 
 A hash of the binder must be included in the attestation evidence. Previous
 to hashing, the binder must be encoded as described in {{binding-mech}}.
