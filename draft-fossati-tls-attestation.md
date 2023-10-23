@@ -185,8 +185,9 @@ The following terms are used in this document:
 
 {: vspace="0"}
 
-TLS Identity Key (TIK): : A cryptographic key used by one of the peers to
-authenticate itself during the TLS handshake.
+TLS Identity Key (TIK):
+: A cryptographic key used by one of the peers to authenticate itself during the
+TLS handshake.
 
 The reader is assumed to be familiar with the vocabulary and concepts defined in
 {{-rats-arch}}, and those in {{-rats-kat}}.
