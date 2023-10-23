@@ -1,7 +1,7 @@
 ---
 title: Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)
 abbrev: Attestation in TLS/DTLS
-docname: draft-fossati-tls-attestation-03
+docname: draft-fossati-tls-attestation-04
 category: std
 
 ipr: trust200902
@@ -185,8 +185,9 @@ The following terms are used in this document:
 
 {: vspace="0"}
 
-TLS Identity Key (TIK): : A cryptographic key used by one of the peers to
-authenticate itself during the TLS handshake.
+TLS Identity Key (TIK):
+: A cryptographic key used by one of the peers to authenticate itself during the
+TLS handshake.
 
 The reader is assumed to be familiar with the vocabulary and concepts defined in
 {{-rats-arch}}, and those in {{-rats-kat}}.
@@ -559,10 +560,12 @@ attestation_channel_binder = {
 
 ~~~~
 TLS-Early-Exporter(label, context_value, key_length) =
-       HKDF-Expand-Label(Derive-Secret(early_exporter_master_secret, label, ""),
-                         "exporter", Hash(context_value), key_length)
+       HKDF-Expand-Label(
+              Derive-Secret(early_exporter_master_secret, label, ""),
+              "exporter", Hash(context_value), key_length)
 
-channel_binder = TLS-Early-Exporter(label = "attestation-binder", context_value = "", key_length = 32)
+channel_binder = TLS-Early-Exporter(label = "attestation-binder",
+                                    context_value = "", key_length = 32)
 ~~~~
 {: #figure-early-exporter title="Usage of TLS v1.3 early exporter for channel binding."}
 
