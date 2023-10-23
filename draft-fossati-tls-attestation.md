@@ -59,9 +59,9 @@ normative:
   RFC2119:
   RFC8446:
   I-D.ftbs-rats-msg-wrap:
-  I-D.bft-rats-kat:
+  I-D.bft-rats-kat: rats-kat
 informative:
-  RFC9334:
+  RFC9334: rats-arch
   I-D.ietf-rats-eat:
   TPM1.2:
     target: https://trustedcomputinggroup.org/resource/tpm-main-specification/
@@ -159,22 +159,22 @@ Likewise, there are different encodings available for attestation results. One
 such encoding, AR4SI {{?I-D.ietf-rats-ar4si}} is being standardized by the RATS
 working group.
 
-This specification defines how to support the background check model in the TLS
-handshake, such that the details about the attestation technology are agnostic
-to the TLS handshake itself. Similarly, support for the passport model is
-defined such that details about the attestation results encodings and trust
+This specification supports both the background check and passport model, during
+TLS Handshake. In background check model the details about the attestation
+technology are agnostic to TLS handshake itself. Similarly, in the passport
+model, the details about the attestation results encoding and trust
 relationships are agnostic to the TLS handshake.
 
 To give the peer information that the handshake signing key is properly secured,
 the associated attestation result has to be appraised by the peer. This must be
 the case when either of the two remote attestation topologies is used. Hence,
-attestation evidence about the security state of the signing key is needed,
-which is typically associated with evidence about the overall platform state.
-The platform attestation service ensures that the key attestation service has
-not been tampered with. The platform attestation service issues the Platform
-Attestation Token (PAT) and the key attestation service issues the Key
-Attestation Token (KAT). The security of the protocol critically depends on the
-verifiable binding between these two logically separate units of evidence.
+the attestation evidence (to be appraised by the verifier) must contain the
+security state of the signing key as well as the overall platform. The platform
+attestation service ensures that the key attestation service has not been
+tampered with. The platform attestation service issues the Platform Attestation
+Token (PAT) and the key attestation service issues the Key Attestation Token
+(KAT). The security of the protocol critically depends on the verifiable binding
+between these two logically separate units of evidence.
 
 This document does not define how different attestation technologies are
 encoded. This is accomplished by companion specifications.
@@ -192,10 +192,10 @@ The reader is assumed to be familiar with the vocabulary and concepts defined in
 {{-rats-arch}}, and those in {{-rats-kat}}.
 
 "Remote attestation evidence" is more succintly referred to as "evidence", and
-"remote attestation results" is more succintly referred to as "results"
-throughout this document. "Remote attestation credentials", or "credentials", is
-used to refer to both evidence and results, when no distinction needs to be made
-between them.
+"remote attestation results" is more succintly referred to as "attestation
+results" throughout this document. "Remote attestation credentials", or
+"attestation credentials", is used to refer to both attestation evidence and
+attestation results, when no distinction needs to be made between them.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
 "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
@@ -214,9 +214,10 @@ remote attestation credentials and nonces to be exchanged. The nonces are used
 for guaranteeing freshness of the exchanged evidence when the background check
 model is in use.
 
-When either the evidence or the results extension is successfully negotiated,
-the content of the corresponding Certificate message contains a payload that is
-encoded based on the wrapper defined in {{I-D.ftbs-rats-msg-wrap}}.
+When either the evidence or the attestation results extension is successfully
+negotiated, the content of the corresponding Certificate message contains a
+payload that is encoded based on the wrapper defined in
+{{I-D.ftbs-rats-msg-wrap}}.
 
 In TLS a client has to demonstrate possession of the private key via the
 CertificateVerify message, when client-based authentication is requested. The
@@ -228,20 +229,16 @@ KAT format utilizing the EAT format can be found in {{I-D.bft-rats-kat}}.
 
 The relying party can obtain and appraise the remote attestation results either
 directly from the Certificate message (in the passport model), or by relaying
-the evidence from the Certificate message to the verifier. Subsequently, the
-attested key is used to verify the CertificateVerify message.
+the evidence from the Certificate message to the verifier and receiving the
+attestation results. Subsequently, the attested key is used to verify the
+CertificateVerify message.
 
 When using the passport model, the remote attestation results obtained by the
 attester from its trusted verifiers can be cached and used for any number of
-subsequent TLS handshakes. This allows the two sides to amortize the cost of
-remote attestation by reducing the frequency with which evidence must be
-produced and appraised. However, this does create a risk of stale attestation
-results being used for authentication. The relying party must therefore be
-empowered to reject an authentication attempt with results that do not meet its
-staleness policy. This should trigger a new evidence appraisal on the attester
-side.
+subsequent TLS handshakes, as long as the freshness policy requirements are
+satisfied.
 
-# Use of Remote Attestation credentials in the TLS handshake
+# Use of Remote Attestation Credentials in the TLS Handshake
 
 For both the passport model (described in section 5.1 of {{RFC9334}}) and
 background check model (described in Section 5.2 of {{RFC9334}}) the following
@@ -256,7 +253,7 @@ Mutual authentication via attestation combines these two (non-interfering)
 flows, including cases where one of the peers uses the passport model for its
 attestation, and the other uses the background check model.
 
-## TLS Client authenticating using evidence 
+## TLS Client Authenticating Using Evidence 
 
 In this use case, the TLS server (acting as a relying party) challenges the TLS
 client (as the attester) to provide evidence. The TLS server needs to provide a
@@ -298,7 +295,7 @@ Auth | {CertificateVerify}
 {: #figure-background-check-model1 title="TLS Client Providing Evidence to TLS Server."}
 
 
-## TLS Server authenticating using evidence
+## TLS Server Authenticating Using Evidence
 
 In this use case the TLS client challenges the TLS server to present evidence. 
 The TLS server acts as an attester while the TLS client is the relying party. 
@@ -337,7 +334,7 @@ Auth | {CertificateVerify}
 ~~~~
 {: #figure-background-check-model2 title="TLS Server Providing Evidence to TLS Client."}
 
-## TLS Client authenticating using results 
+## TLS Client Authenticating Using Attestation Results 
 
 In this use case the TLS client, as the attester, provides attestation results
 to the TLS server. The TLS client is the attester and the the TLS server acts as
@@ -371,7 +368,7 @@ Auth | {CertificateVerify}
 {: #figure-passport-model1 title="TLS Client Providing Results to TLS Server."}
 
 
-## TLS Server authenticating using results
+## TLS Server Authenticating Using Results
 
 In this use case the TLS client, as the relying party, requests attestation
 results from the TLS server. Prior to delivering its Certificate message, the
@@ -402,7 +399,7 @@ Auth | {CertificateVerify}
      v {Finished}              -------->
        [Application Data]      <------->  [Application Data]
 ~~~~
-{: #figure-passport-model2 title="TLS Server Providing Results to TLS Client."}
+{: #figure-passport-model2 title="TLS Server Providing Attestation Results to TLS Client."}
 
 # Evidence Extensions (Background Check Model)
 
@@ -484,7 +481,7 @@ model of {{RFC8446}}.
 The encoding of the evidence structure is defined in
 {{I-D.ftbs-rats-msg-wrap}}.
 
-## Attestation alongside X.509 certificates {#pkix-attest}
+## Attestation Alongside X.509 Certificates {#pkix-attest}
 
 When the chosen evidence type indicates usage of both attestation and PKIX,
 the X.509 certificate will serve as the main payload in the Certificate
@@ -575,7 +572,7 @@ to hashing, the binder must be encoded as described in {{binding-mech}}.
 The hash algorithm negotiatied within the handshake must be used wherever
 hashing is required for the binder.
 
-# Results Extensions (Passport Model)
+# Attestation Results Extensions (Passport Model)
 
 ~~~~
    struct {
@@ -602,7 +599,7 @@ hashing is required for the binder.
            }
    } resultsProposalTypeExtension;
 ~~~~
-{: #figure-extension-results title="TLS Extension Structure for Results."}
+{: #figure-extension-results title="TLS Extension Structure for Attestation Results."}
 
 # TLS Client and Server Handshake Behavior {#behavior}
 
@@ -730,9 +727,9 @@ the ClientHello.
 
 ### Client Hello
 
-To indicate the support for passing results in TLS following the passport model,
-clients include the results_proposal and/or the results_request extensions in
-the ClientHello message.
+To indicate the support for passing attestation results in TLS following the
+passport model, clients include the results_proposal and/or the results_request
+extensions in the ClientHello message.
 
 The results_proposal extension in the ClientHello message indicates the verifier
 identities from which it can relay attestation results, when requested using a
@@ -748,16 +745,16 @@ client supports only one verifier, it is a list containing a single element.
 
 The client MUST omit verifier identities from the results_proposal extension in
 the ClientHello if it cannot respond to a request from the server to present
-results from a proposed verifier, or if the client is not configured to relay
-attestation results from the proposed verifier with the given server. If the
+attestation results from a proposed verifier, or if the client is not configured
+to relay the results from the proposed verifier with the given server. If the
 client has no verifier identities to send in the ClientHello it MUST omit the
 results_proposal extension in the ClientHello.
 
 The client MUST omit verifier identities from the results_request extension in
-the ClientHello if it is not configured to trust results issued by said
-verifiers. If the client does not act as a relying party with regards to results
-processing (as defined in the RATS architecture) then the client MUST omit the
-results_request extension from the ClientHello.
+the ClientHello if it is not configured to trust attestation results issued by
+said verifiers. If the client does not act as a relying party with regards to
+the processing of attestation results (as defined in the RATS architecture) then
+the client MUST omit the results_request extension from the ClientHello.
 
 ### Server Hello
 
@@ -778,15 +775,15 @@ possible:
    rules described below are followed.
 
 The results_proposal extension in the ClientHello indicates the verifier
-identities from which the client is able to provide results to the server, when
-challenged using a certificate_request message.  If the server wants to request
-evidence from the client, it MUST include the results_proposal extension in the
-EncryptedExtensions. This results_proposal extension in the EncryptedExtensions
-then indicates what verifier the client is requested to provide results from in
-a subsequent Certificate message.  The value conveyed in the results_proposal
-extension by the server MUST be selected from one of the values provided in the
-results_proposal extension sent in the ClientHello.  The server MUST also send a
-certificate_request message.
+identities from which the client is able to provide attestation results to the
+server, when challenged using a certificate_request message.  If the server
+wants to request evidence from the client, it MUST include the results_proposal
+extension in the EncryptedExtensions. This results_proposal extension in the
+EncryptedExtensions then indicates what verifier the client is requested to
+provide attestation results from in a subsequent Certificate message.  The value
+conveyed in the results_proposal extension by the server MUST be selected from
+one of the values provided in the results_proposal extension sent in the
+ClientHello.  The server MUST also send a certificate_request message.
 
 If the server does not send a certificate_request message or none of the
 verifier identities proposed by the client (as indicated in the results_proposal
@@ -794,11 +791,12 @@ extension in the ClientHello) match the server-trusted verifiers, then the
 results_proposal extension in the ServerHello MUST be omitted.
 
 The results_request extension in the ClientHello indicates what verifiers the
-client trusts as issuers of results for the server. With the results_request
-extension in the EncryptedExtensions, the server indicates the identity of the
-verifier who issued the results carried in the Certificate message sent by the
-server. The verifier identity in the results_request extension MUST contain a
-single value selected from the results_request extension in the ClientHello.
+client trusts as issuers of attestation results for the server. With the
+results_request extension in the EncryptedExtensions, the server indicates the
+identity of the verifier who issued the attestation results carried in the
+Certificate message sent by the server. The verifier identity in the
+results_request extension MUST contain a single value selected from the
+results_request extension in the ClientHello.
 
 # Background-Check Model Examples
 
@@ -810,10 +808,9 @@ scenario for secure, privacy-preserving multiparty computation,
 including anti-money laundering, drug development in healthcare, contact
 tracing in pandemic times, etc.
 
-In such scenarios, the users (e.g., the party providing the data input
-for the computation, the consumer of the computed results, the party
-providing a proprietary ML model used in the computation) have two
-goals:
+In such scenarios, the users (e.g., the party providing the data input for the
+computation, the consumer of the computed attestation results, the party
+providing a proprietary ML model used in the computation) have two goals:
 
 - Identifying the workload they are interacting with,
 - Making sure that the platform on which the workload executes is a
@@ -1056,12 +1053,12 @@ TBD.
 
 ## TLS Extensions
 
-IANA is asked to allocate two new TLS extensions, evidence_request
-and evidence_proposal, from the "TLS ExtensionType Values"
-subregistry of the "Transport Layer Security (TLS) Extensions"
-registry {{TLS-Ext-Registry}}.  These extensions are used in
-the ClientHello and the EncryptedExtensions messages. The
-values carried in these extensions are taken from TBD.
+IANA is asked to allocate four new TLS extensions, evidence_request,
+evidence_proposal, results_request, results_proposal, from the "TLS
+ExtensionType Values" subregistry of the "Transport Layer Security (TLS)
+Extensions" registry {{TLS-Ext-Registry}}.  These extensions are used in the
+ClientHello and the EncryptedExtensions messages. The values carried in these
+extensions are taken from TBD.
 
 ## TLS Alerts
 
@@ -1149,7 +1146,7 @@ possible:
     is described in {{I-D.bft-rats-kat}}.
 
 
-# Cross-protocol binding mechanism {#binding-mech}
+# Cross-protocol Binding Mechanism {#binding-mech}
 
 Note: This section describes a protocol-agnostic mechanism which is used in
 the context of TLS within the body of the draft. The mechanism might, in
@@ -1162,17 +1159,16 @@ protocol, the remote attestation credentials must be verifiably linked to
 the outer protocol. The main reason for this requirement is security: a
 lack of binding can result in the attestation credentials being relayed.
 
-If the attestation credentials can be enhanced freely and in a verifiable
-way, the binding can be performed by inserting the relevant data as new
-claims. If the ways of enhancing the credentials are more restricted,
-ad-hoc solutions can be devised which address the issue. For example, many
-roots of trust only allow a small amount (32-64 bytes) of user-provided
-data which will be included in the attestation token. If more data must be
-included, it must therefore be compressed. In this case, the problem is
-compounded by the need to also include a challenge value coming from the
-relying party. The verification steps also become more complex, as the
-binding data must be returned from the verifier and checked by the relying
-party.
+If the attestation credentials can be enhanced freely and in a verifiable way,
+the binding can be performed by inserting the relevant data as new claims. If
+the ways of enhancing the attestation credentials are more restricted, ad-hoc
+solutions can be devised which address the issue. For example, many roots of
+trust only allow a small amount (32-64 bytes) of user-provided data which will
+be included in the attestation token. If more data must be included, it must
+therefore be compressed. In this case, the problem is compounded by the need to
+also include a challenge value coming from the relying party. The verification
+steps also become more complex, as the binding data must be returned from the
+verifier and checked by the relying party.
 
 However, regardless of how the binding and verification are performed,
 similar but distinct approaches need to be taken for every protocol into
@@ -1181,7 +1177,7 @@ binding data could differ. A more standardised way of tackling this issue
 would therefore be beneficial. This appendix presents a solution to this
 problem, in the context of attestation evidence.
 
-## Binding mechanism
+## Binding Mechanism
 
 The core of the binding mechanism consists of a new token format - the
 Attestation Channel Binder - that represents a set of binders as a CBOR
