@@ -23,10 +23,11 @@ jobs:
       - name: Create I-D environment
         run: |
           sudo gem install kramdown-rfc2629
-          sudo pip3 install xml2rfc
+          sudo apt install pipx
+          sudo pipx install xml2rfc
           # Only kramdown-rfc2629 and xml2rfc are generic.
-          # The rest is fancy stuff for STAR Delegation
-          sudo pip3 install svgcheck
+          # The rest is fancy stuff for diagrams and pics
+          sudo pipx install svgcheck
           npm install -g aasvg
           # Add to system path
           echo "$HOME/go/bin" >> $GITHUB_PATH
