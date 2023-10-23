@@ -1,7 +1,7 @@
 ---
 title: Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)
 abbrev: Attestation in TLS/DTLS
-docname: draft-fossati-tls-attestation-03
+docname: draft-fossati-tls-attestation-04
 category: std
 
 ipr: trust200902
