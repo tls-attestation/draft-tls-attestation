@@ -560,10 +560,12 @@ attestation_channel_binder = {
 
 ~~~~
 TLS-Early-Exporter(label, context_value, key_length) =
-       HKDF-Expand-Label(Derive-Secret(early_exporter_master_secret, label, ""),
-                         "exporter", Hash(context_value), key_length)
+       HKDF-Expand-Label(
+              Derive-Secret(early_exporter_master_secret, label, ""),
+              "exporter", Hash(context_value), key_length)
 
-channel_binder = TLS-Early-Exporter(label = "attestation-binder", context_value = "", key_length = 32)
+channel_binder = TLS-Early-Exporter(label = "attestation-binder",
+                                    context_value = "", key_length = 32)
 ~~~~
 {: #figure-early-exporter title="Usage of TLS v1.3 early exporter for channel binding."}
 
