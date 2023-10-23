@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="640" width="544" viewBox="0 0 544 640" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="640" width="544" viewBox="0 0 544 640" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
 <path d="M 8,16 L 8,48" fill="none" stroke="black"/>
 <path d="M 40,48 L 40,624" fill="none" stroke="black"/>
 <path d="M 72,16 L 72,48" fill="none" stroke="black"/>
@@ -40,13 +40,13 @@
 <path d="M 376,592 C 384.83064,592 392,584.83064 392,576" fill="none" stroke="black"/>
 <path d="M 144,608 C 135.16936,608 128,600.83064 128,592" fill="none" stroke="black"/>
 <path d="M 520,608 C 528.83064,608 536,600.83064 536,592" fill="none" stroke="black"/>
-<polygon class="arrowhead" points="488,336 476,330.4 476,341.6 " fill="black" transform="rotate(0,480,336)"/>
-<polygon class="arrowhead" points="368,592 356,586.4 356,597.6 " fill="black" transform="rotate(180,360,592)"/>
-<polygon class="arrowhead" points="368,368 356,362.4 356,373.6 " fill="black" transform="rotate(180,360,368)"/>
-<polygon class="arrowhead" points="352,544 340,538.4 340,549.6 " fill="black" transform="rotate(0,344,544)"/>
-<polygon class="arrowhead" points="352,256 340,250.4 340,261.6 " fill="black" transform="rotate(0,344,256)"/>
-<polygon class="arrowhead" points="192,464 180,458.4 180,469.6 " fill="black" transform="rotate(180,184,464)"/>
-<polygon class="arrowhead" points="192,144 180,138.4 180,149.6 " fill="black" transform="rotate(180,184,144)"/>
+<polygon class="arrowhead" points="488,336 476,330.4 476,341.6" fill="black" transform="rotate(0,480,336)"/>
+<polygon class="arrowhead" points="368,592 356,586.4 356,597.6" fill="black" transform="rotate(180,360,592)"/>
+<polygon class="arrowhead" points="368,368 356,362.4 356,373.6" fill="black" transform="rotate(180,360,368)"/>
+<polygon class="arrowhead" points="352,544 340,538.4 340,549.6" fill="black" transform="rotate(0,344,544)"/>
+<polygon class="arrowhead" points="352,256 340,250.4 340,261.6" fill="black" transform="rotate(0,344,256)"/>
+<polygon class="arrowhead" points="192,464 180,458.4 180,469.6" fill="black" transform="rotate(180,184,464)"/>
+<polygon class="arrowhead" points="192,144 180,138.4 180,149.6" fill="black" transform="rotate(180,184,144)"/>
 <g class="text">
 <text x="40" y="36">TLS A</text>
 <text x="180" y="36">Verifier X</text>
@@ -64,11 +64,11 @@
 <text x="404" y="292">nonce,</text>
 <text x="392" y="308">TIK</text>
 <text x="368" y="324">)</text>
-<text x="416" y="356">KAT</text>
+<text x="420" y="356">CAB(KAT,PAT)</text>
 <text x="252" y="388">POST /65728E8D</text>
 <text x="224" y="404">Body: {</text>
-<text x="272" y="420">kat-media-type,</text>
-<text x="224" y="436">KAT</text>
+<text x="272" y="420">cab-media-type,</text>
+<text x="260" y="436">CAB(KAT,PAT)</text>
 <text x="200" y="452">}</text>
 <text x="200" y="484">200</text>
 <text x="216" y="500">Body: {</text>
