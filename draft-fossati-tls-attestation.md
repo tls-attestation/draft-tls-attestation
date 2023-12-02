@@ -254,6 +254,26 @@ Mutual authentication via attestation combines these two (non-interfering)
 flows, including cases where one of the peers uses the passport model for its
 attestation, and the other uses the background check model.
 
+## Handshake Overview
+
+The handshake defined here is analogous to certificate-based authentication in a regular TLS handshake. Instead of the certificate's private key, we use
+the TIK identity key. This key is attested, with attestation being carried
+by the Certificate message. Following that, the peer being attested proves possession of the private key using the CertificateVerify message.
+
+Depending on the use case, the protocol supports peer authentication
+using attestation only, or using both attestation and a regular public
+key certificate.
+
+The current version of the document assumes the KAT/PAT construct of 
+{{I-D.bft-rats-kat}}. Not all platforms support this model, and a document
+that defines private key attestation for use in TLS Attestation as defined here, must specify:
+
+* The format and the lifetime of TIK (e.g. an ephemeral, per session TIK vs.
+a long lived one).
+* How the key is attested using a structure carried by the
+Certificate message.
+* How proof of possession is performed.
+
 ## TLS Client Authenticating Using Evidence 
 
 In this use case, the TLS server (acting as a relying party) challenges the TLS
