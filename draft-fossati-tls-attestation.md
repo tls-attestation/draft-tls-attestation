@@ -162,8 +162,10 @@ working group.
 This specification supports both the background check and passport model, during
 TLS Handshake. In background check model the details about the attestation
 technology are agnostic to TLS handshake itself. Similarly, in the passport
-model, the details about the attestation results encoding and trust
-relationships are agnostic to the TLS handshake.
+model, the details about the attestation results encoding and trust relationships
+are agnostic to the TLS handshake. Moreover, this specification allows both peers
+to authenticate themselves using remote attestation credentials, and for their
+attestation topologies to be independent of each other.
 
 To give the peer information that the handshake signing key is properly secured,
 the associated attestation result has to be appraised by the peer. This must be
