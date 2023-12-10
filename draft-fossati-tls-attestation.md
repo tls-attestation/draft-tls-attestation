@@ -175,8 +175,9 @@ security state of the signing key as well as the overall platform. The platform
 attestation service ensures that the key attestation service has not been
 tampered with. The platform attestation service issues the Platform Attestation
 Token (PAT) and the key attestation service issues the Key Attestation Token
-(KAT). The security of the protocol critically depends on the verifiable binding
-between these two logically separate units of evidence.
+(KAT) as described in {{-rats-kat}}. The security of the protocol critically
+depends on the verifiable binding between these two logically separate units of
+evidence.
 
 This document does not define how different attestation technologies are
 encoded. This is accomplished by companion specifications.
