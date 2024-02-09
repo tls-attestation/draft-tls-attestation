@@ -129,26 +129,45 @@ attestation.
 
 #  Introduction
 
-The Remote ATtestation ProcedureS (RATS) architecture defines two basic types 
-of topological patterns to communicate between an attester, a relying party, and
-a verifier, namely the background-check model and the passport model. These two 
-models are fundamentally different and require a different treatment when 
-incorporated into the TLS handshake. For better readability we suggest to use different 
-extensions for these two models.
+Secure channel establishment in TLS ({{RFC8446}}) relies on authentication to
+afford each entity the confidence that exchanged data can only be accessed by the
+expected peer. In the context of a workload running in a Trusted Execution
+Environment, the authentication process benefits from a powerful primitive -
+remote attestation. Remote attestation allows the workload to offer guarantees
+about its security state, enabling more comprehensive security policies.
+
+The Remote ATtestation ProcedureS (RATS) architecture {{-rats-arch}} defines two
+basic topological patterns for communication between an attester, a relying
+party, and a verifier, namely the background-check model and the passport model.
+These two models are fundamentally different, and thus require a different
+treatment when incorporated into the TLS handshake. For better readability we
+suggest the use of different extensions for these two models.
 
 The two models can be summarized as follows:
 
-- In the background check model, the attester conveys evidence to the relying party,
-  which then forwards the evidence to the verifier for appraisal; the verifier 
-  computes the attestation result and sends it back to the relying party.
+- In the background check model, the attester conveys evidence to the relying
+  party, which then forwards the evidence to the verifier for appraisal; the
+  verifier computes the attestation result and sends it back to the relying
+  party. Because the attestation evidence is produced and verified during the TLS
+  handshake, special consideration must be given to ensuring the freshness and
+  provenance of the evidence (see {{evidence-extensions}}).
   
-- In the passport model, the attester transmits evidence to the verifier 
-  directly and receives attestation results, which are then relayed to the
-  relying party.
+- In the passport model, the attester transmits evidence to the verifier directly
+  and receives attestation results, which are then relayed to the relying party.
+  Given that the credential is not expected to be generated in-band during the
+  handshake, fewer inter-protocol requirements must be satisfied (see
+  {{attestation-results-extensions}}).
 
-This specification supports both patterns.
+This specification supports both patterns. In background check model any
+attestation technology characteristics - such as evidence encoding format, and
+semantics of the evidence contents - are agnostic to TLS handshake itself.
+Similarly, in the passport model, the characteristics of the attestation results
+- such as encoding format and trust relationships - are agnostic to the TLS
+handshake. Moreover, this specification allows both peers to authenticate
+themselves using remote attestation credentials, and for their attestation
+topologies to be independent of each other.
 
-Several formats for encoding evidence are available, such as:
+Several mechanisms for producing and encoding evidence are available, such as:
 
 - the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}, 
 - the Trusted Platform Modules (TPMs) {{TPM1.2}} {{TPM2.0}},
@@ -156,31 +175,23 @@ Several formats for encoding evidence are available, such as:
 - Apple Key Attestation. 
 
 Likewise, there are different encodings available for attestation results. One
-such encoding, AR4SI {{?I-D.ietf-rats-ar4si}} is being standardized by the RATS
+such encoding, AR4SI {{?I-D.ietf-rats-ar4si}}, is being standardized by the RATS
 working group.
 
-This specification supports both the background check and passport model, during
-TLS Handshake. In background check model the details about the attestation
-technology are agnostic to TLS handshake itself. Similarly, in the passport
-model, the details about the attestation results encoding and trust relationships
-are agnostic to the TLS handshake. Moreover, this specification allows both peers
-to authenticate themselves using remote attestation credentials, and for their
-attestation topologies to be independent of each other.
+However, this document does not specify how different attestation technologies
+should be defined, only that they should all be usable within our framework.
+Attestation mechanisms must be defined by companion specifications.
 
 To give the peer information that the handshake signing key is properly secured,
 the associated attestation result has to be appraised by the peer. This must be
 the case when either of the two remote attestation topologies is used. Hence,
-the attestation evidence (to be appraised by the verifier) must contain the
-security state of the signing key as well as the overall platform. The platform
-attestation service ensures that the key attestation service has not been
-tampered with. The platform attestation service issues the Platform Attestation
-Token (PAT) and the key attestation service issues the Key Attestation Token
-(KAT) as described in {{-rats-kat}}. The security of the protocol critically
-depends on the verifiable binding between these two logically separate units of
-evidence.
-
-This document does not define how different attestation technologies are
-encoded. This is accomplished by companion specifications.
+attestation evidence must contain the security state of both the signing key and
+of the platform hosting it. A Platform Attestation Service issues Platform
+Attestation Tokens (PAT) to prove that the Key Attestation Service has not been
+tampered with. The Key Attestation Service in turn issues Key Attestation Tokens
+(KAT) to prove that the signing key is secure, as described in {{-rats-kat}}. The
+security of the protocol critically depends on the verifiable binding between
+these two logically separate units of evidence.
 
 # Conventions and Terminology
 
@@ -429,7 +440,7 @@ Auth | {CertificateVerify}
 ~~~~
 {: #figure-passport-model2 title="TLS Server Providing Attestation Results to TLS Client."}
 
-# Evidence Extensions (Background Check Model)
+# Evidence Extensions (Background Check Model) {#evidence-extensions}
 
 The EvidenceType structure also contains an indicator for the type of credential
 expected in the Certificate message. The credential can either contain
@@ -602,7 +613,7 @@ to hashing, the binder must be encoded as described in {{binding-mech}}.
 The hash algorithm negotiatied within the handshake must be used wherever
 hashing is required for the binder.
 
-# Attestation Results Extensions (Passport Model)
+# Attestation Results Extensions (Passport Model) {#attestation-results-extensions}
 
 ~~~~
    struct {
