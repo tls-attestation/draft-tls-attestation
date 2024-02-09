@@ -866,23 +866,24 @@ party) while the TLS server is co-located with the TEE-hosted
 confidential workload (the attester).
 
 The flow starts with the client initiating a verification session with a
-trusted verifier.  The verifier returns the kinds of evidence it
+trusted verifier.  The verifier returns the evidence types it
 understands and a nonce that will be used to challenge the attester.
 
 The client starts the TLS handshake with the server by supplying the
 attestation-related parameters it has obtained from the verifier.  If
 the server supports one of the offered evidence types, it will echo it
-in the specular extension and proceed by invoking the local API to
-request the attestation.  The returned evidence binds the identity key
-with the platform identity and security state.  The server
-then signs the handshake transcript with the (attested) identity key,
-and sends the attestation evidence together with the signature over to
-the client.
+in the specular extension and proceed by invoking the local API
+('attest_key(...)') to request attestation using the nonce supplied by
+the verifier.  The returned evidence binds the identity key (TIK) with
+the platform identity and security state, packaged into a CAB.  The
+server then signs the handshake transcript ('hs' in
+{{figure-cc-example}}) with the (attested) identity key, and sends the
+attestation evidence together with the signature over to the client.
 
 The client forwards the attestation evidence to the verifier using the
-previously established session, obtains the attestation result and
-checks whether it is acceptable according to its local policy.  If so, it
-proceeds and verifies the handshake signature using the corresponding
+previously established session, obtains the attestation result (AR) and
+checks whether it is acceptable according to its local policy.  If so,
+it proceeds and verifies the handshake signature using the corresponding
 public key (for example, using the PoP key in the KAT evidence
 {{I-D.bft-rats-kat}}).
 
