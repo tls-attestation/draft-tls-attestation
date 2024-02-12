@@ -896,12 +896,12 @@ confidential computing properties.
 |  |                    |<-----------------------+               |    |
 |  |                    |                        | attest_key(   |    |
 |  |                    |                        |   nonce,      |    |
-|  |                    |                        |   TIK         |    |
+|  |                    |                        |   TIK-S       |    |
 |  |                    |                        | )             |    |
 |  |                    |                        +-------------->|    |
 |  |                    |                        | CAB(KAT, PAT) |    |
 |  |                    |                        |<--------------+    |
-|  |                    |                        | sign(TIK,hs)  |    |
+|  |                    |                        | sign(TIK-S,hs)|    |
 |  |                    |                        +-------------->|    |
 |  |                    |                        |     sig       |    |
 |  |                    |                        |<--------------+    |
@@ -1011,12 +1011,12 @@ the TLS server will terminate the exchange.
 |  |                | Certificate            |                   |    |
 |  |  attest_key(   | CertificateVerify      |                   |    |
 |  |    nonce,      | Finished               |                   |    |
-|  |    TIK         |<-----------------------+                   |    |
+|  |    TIK-C       |<-----------------------+                   |    |
 |  |  )             |                        |                   |    |
 |  |<---------------+                        |                   |    |
 |  |  CAB(KAT, PAT) |                        |                   |    |
 |  +--------------->|                        |                   |    |
-|  |  sign(TIK,hs)  |                        |                   |    |
+|  | sign(TIK-C,hs) |                        |                   |    |
 |  |<---------------+                        |                   |    |
 |  |      sig       |                        |                   |    |
 |  +--------------->| Certificate(KAT,PAT)   |                   |    |
