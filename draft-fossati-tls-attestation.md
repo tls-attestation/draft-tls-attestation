@@ -129,40 +129,40 @@ attestation.
 
 #  Introduction
 
-Secure channel establishment in TLS ({{RFC8446}}) relies on authentication to
-afford each entity the confidence that exchanged data can only be accessed by the
-expected peer. In the context of a workload running in a Trusted Execution
-Environment, the authentication process benefits from a powerful primitive -
-remote attestation. Remote attestation allows the workload to offer guarantees
-about its security state, enabling more comprehensive security policies.
+Secure channel establishment in TLS ({{RFC8446}}) relies on
+authentication to afford each entity the confidence that exchanged data
+can only be accessed by the expected peer. When running a workload in a
+Trusted Execution Environment (TEE), the authentication process can be
+enhanced with remote attestation. Remote attestation allows the workload
+to offer guarantees about its security state, enabling more
+comprehensive security policies.
 
 The Remote ATtestation ProcedureS (RATS) architecture {{-rats-arch}} defines two
 basic topological patterns for communication between an attester, a relying
 party, and a verifier, namely the background-check model and the passport model.
 These two models are fundamentally different, and thus require a different
-treatment when incorporated into the TLS handshake. For better readability we
-suggest the use of different extensions for these two models.
+treatment when incorporated into the TLS handshake.
 
 The two models can be summarized as follows:
 
-- In the background check model, the attester conveys evidence to the relying
-  party, which then forwards the evidence to the verifier for appraisal; the
-  verifier computes the attestation result and sends it back to the relying
-  party. Because the attestation evidence is produced and verified during the TLS
-  handshake, special consideration must be given to ensuring the freshness and
-  provenance of the evidence (see {{evidence-extensions}}).
+- In the background check process, an attester provides evidence to a relying
+  party, who forwards it to a verifier for appraisal. The
+  verifier then computes the attestation result and sends it back to the relying
+  party. As the attestation evidence is generated and verified during the TLS
+  handshake, it is essential to ensure the evidence's freshness and
+  origin (refer to {{evidence-extensions}} for more details).
   
 - In the passport model, the attester transmits evidence to the verifier directly
-  and receives attestation results, which are then relayed to the relying party.
+  and receives an attestation result, which is then relayed to the relying party.
   Given that the credential is not expected to be generated in-band during the
   handshake, fewer inter-protocol requirements must be satisfied (see
   {{attestation-results-extensions}}).
 
-This specification supports both patterns. In background check model any
-attestation technology characteristics - such as evidence encoding format, and
-semantics of the evidence contents - are agnostic to TLS handshake itself.
-Similarly, in the passport model, the characteristics of the attestation results
-- such as encoding format and trust relationships - are agnostic to the TLS
+This specification supports both patterns. In the background check model, any
+attestation technology characteristics, such as evidence encoding format and
+semantics of the evidence contents, are agnostic to the TLS handshake itself.
+Similarly, in the passport model, the characteristics of the attestation results,
+such as encoding format and trust relationships, are agnostic to the TLS
 handshake. Moreover, this specification allows both peers to authenticate
 themselves using remote attestation credentials, and for their attestation
 topologies to be independent of each other.
@@ -873,10 +873,10 @@ The client starts the TLS handshake with the server by supplying the
 attestation-related parameters it has obtained from the verifier.  If
 the server supports one of the offered evidence types, it will echo it
 in the specular extension and proceed by invoking the local API
-('attest_key(...)') to request attestation using the nonce supplied by
+(`attest_key(...)`) to request attestation using the nonce supplied by
 the verifier.  The returned evidence binds the identity key (TIK) with
 the platform identity and security state, packaged into a CAB.  The
-server then signs the handshake transcript ('hs' in
+server then signs the handshake transcript (`hs` in
 {{figure-cc-example}}) with the (attested) identity key, and sends the
 attestation evidence together with the signature over to the client.
 
