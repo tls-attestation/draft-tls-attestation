@@ -189,6 +189,10 @@ TLS Identity Key (TIK):
 : A cryptographic key used by one of the peers to authenticate itself during the
 TLS handshake.
 
+TIK-C, TIK-S:
+
+: The TIK that identifies the client or the server, respectively.
+
 The reader is assumed to be familiar with the vocabulary and concepts defined in
 {{-rats-arch}}, and those in {{-rats-kat}}.
 
@@ -223,7 +227,7 @@ payload that is encoded based on the wrapper defined in
 In TLS a client has to demonstrate possession of the private key via the
 CertificateVerify message, when client-based authentication is requested. The
 attestation payload must contain assertions relating to the client's TLS
-Identity Key (TIK), which associate the private key with the attestation
+Identity Key (TIK-C), which associate the private key with the attestation
 information. These assertions may come in the form of a Key Attestation Token
 (KAT), or of specific claims in an attestation result document. An example of a
 KAT format utilizing the EAT format can be found in {{I-D.bft-rats-kat}}.
