@@ -1,20 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="640" width="544" viewBox="0 0 544 640" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="656" width="544" viewBox="0 0 544 656" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
 <path d="M 8,16 L 8,48" fill="none" stroke="black"/>
-<path d="M 40,48 L 40,624" fill="none" stroke="black"/>
+<path d="M 40,48 L 40,640" fill="none" stroke="black"/>
 <path d="M 72,16 L 72,48" fill="none" stroke="black"/>
 <path d="M 128,16 L 128,48" fill="none" stroke="black"/>
-<path d="M 128,80 L 128,592" fill="none" stroke="black"/>
+<path d="M 128,80 L 128,608" fill="none" stroke="black"/>
 <path d="M 176,48 L 176,80" fill="none" stroke="black"/>
-<path d="M 176,112 L 176,624" fill="none" stroke="black"/>
+<path d="M 176,112 L 176,640" fill="none" stroke="black"/>
 <path d="M 232,16 L 232,48" fill="none" stroke="black"/>
 <path d="M 288,96 L 288,112" fill="none" stroke="black"/>
 <path d="M 320,16 L 320,48" fill="none" stroke="black"/>
-<path d="M 352,48 L 352,624" fill="none" stroke="black"/>
+<path d="M 352,48 L 352,640" fill="none" stroke="black"/>
 <path d="M 384,16 L 384,48" fill="none" stroke="black"/>
 <path d="M 448,16 L 448,48" fill="none" stroke="black"/>
-<path d="M 488,48 L 488,624" fill="none" stroke="black"/>
+<path d="M 488,48 L 488,640" fill="none" stroke="black"/>
 <path d="M 536,16 L 536,48" fill="none" stroke="black"/>
-<path d="M 536,128 L 536,592" fill="none" stroke="black"/>
+<path d="M 536,128 L 536,608" fill="none" stroke="black"/>
 <path d="M 8,16 L 72,16" fill="none" stroke="black"/>
 <path d="M 128,16 L 232,16" fill="none" stroke="black"/>
 <path d="M 320,16 L 384,16" fill="none" stroke="black"/>
@@ -27,25 +27,25 @@
 <path d="M 128,112 L 520,112" fill="none" stroke="black"/>
 <path d="M 184,144 L 352,144" fill="none" stroke="black"/>
 <path d="M 176,256 L 344,256" fill="none" stroke="black"/>
-<path d="M 352,336 L 480,336" fill="none" stroke="black"/>
-<path d="M 360,368 L 488,368" fill="none" stroke="black"/>
-<path d="M 184,464 L 352,464" fill="none" stroke="black"/>
-<path d="M 176,544 L 344,544" fill="none" stroke="black"/>
-<path d="M 352,560 L 376,560" fill="none" stroke="black"/>
-<path d="M 360,592 L 376,592" fill="none" stroke="black"/>
-<path d="M 144,608 L 520,608" fill="none" stroke="black"/>
+<path d="M 352,352 L 480,352" fill="none" stroke="black"/>
+<path d="M 360,384 L 488,384" fill="none" stroke="black"/>
+<path d="M 184,480 L 352,480" fill="none" stroke="black"/>
+<path d="M 176,560 L 344,560" fill="none" stroke="black"/>
+<path d="M 352,576 L 376,576" fill="none" stroke="black"/>
+<path d="M 360,608 L 376,608" fill="none" stroke="black"/>
+<path d="M 144,624 L 520,624" fill="none" stroke="black"/>
 <path d="M 272,80 C 280.83064,80 288,87.16936 288,96" fill="none" stroke="black"/>
 <path d="M 520,112 C 528.83064,112 536,119.16936 536,128" fill="none" stroke="black"/>
-<path d="M 376,560 C 384.83064,560 392,567.16936 392,576" fill="none" stroke="black"/>
-<path d="M 376,592 C 384.83064,592 392,584.83064 392,576" fill="none" stroke="black"/>
-<path d="M 144,608 C 135.16936,608 128,600.83064 128,592" fill="none" stroke="black"/>
-<path d="M 520,608 C 528.83064,608 536,600.83064 536,592" fill="none" stroke="black"/>
-<polygon class="arrowhead" points="488,336 476,330.4 476,341.6" fill="black" transform="rotate(0,480,336)"/>
-<polygon class="arrowhead" points="368,592 356,586.4 356,597.6" fill="black" transform="rotate(180,360,592)"/>
-<polygon class="arrowhead" points="368,368 356,362.4 356,373.6" fill="black" transform="rotate(180,360,368)"/>
-<polygon class="arrowhead" points="352,544 340,538.4 340,549.6" fill="black" transform="rotate(0,344,544)"/>
+<path d="M 376,576 C 384.83064,576 392,583.16936 392,592" fill="none" stroke="black"/>
+<path d="M 376,608 C 384.83064,608 392,600.83064 392,592" fill="none" stroke="black"/>
+<path d="M 144,624 C 135.16936,624 128,616.83064 128,608" fill="none" stroke="black"/>
+<path d="M 520,624 C 528.83064,624 536,616.83064 536,608" fill="none" stroke="black"/>
+<polygon class="arrowhead" points="488,352 476,346.4 476,357.6" fill="black" transform="rotate(0,480,352)"/>
+<polygon class="arrowhead" points="368,608 356,602.4 356,613.6" fill="black" transform="rotate(180,360,608)"/>
+<polygon class="arrowhead" points="368,384 356,378.4 356,389.6" fill="black" transform="rotate(180,360,384)"/>
+<polygon class="arrowhead" points="352,560 340,554.4 340,565.6" fill="black" transform="rotate(0,344,560)"/>
 <polygon class="arrowhead" points="352,256 340,250.4 340,261.6" fill="black" transform="rotate(0,344,256)"/>
-<polygon class="arrowhead" points="192,464 180,458.4 180,469.6" fill="black" transform="rotate(180,184,464)"/>
+<polygon class="arrowhead" points="192,480 180,474.4 180,485.6" fill="black" transform="rotate(180,184,480)"/>
 <polygon class="arrowhead" points="192,144 180,138.4 180,149.6" fill="black" transform="rotate(180,184,144)"/>
 <g class="text">
 <text x="40" y="36">TLS A</text>
@@ -62,18 +62,19 @@
 <text x="192" y="244">}</text>
 <text x="408" y="276">attest_key(</text>
 <text x="404" y="292">nonce,</text>
-<text x="392" y="308">TIK</text>
-<text x="368" y="324">)</text>
-<text x="420" y="356">CAB(KAT,PAT)</text>
-<text x="252" y="388">POST /65728E8D</text>
-<text x="224" y="404">Body: {</text>
-<text x="272" y="420">cab-media-type,</text>
-<text x="260" y="436">CAB(KAT,PAT)</text>
-<text x="200" y="452">}</text>
-<text x="200" y="484">200</text>
-<text x="216" y="500">Body: {</text>
-<text x="268" y="516">att-result: AR{}</text>
-<text x="192" y="532">}</text>
-<text x="436" y="580">cache AR{}</text>
+<text x="412" y="308">TIK-C or</text>
+<text x="424" y="324">TIK-S</text>
+<text x="368" y="340">)</text>
+<text x="420" y="372">CAB(KAT,PAT)</text>
+<text x="252" y="404">POST /65728E8D</text>
+<text x="224" y="420">Body: {</text>
+<text x="272" y="436">cab-media-type,</text>
+<text x="260" y="452">CAB(KAT,PAT)</text>
+<text x="200" y="468">}</text>
+<text x="200" y="500">200</text>
+<text x="216" y="516">Body: {</text>
+<text x="268" y="532">att-result: AR{}</text>
+<text x="192" y="548">}</text>
+<text x="436" y="596">cache AR{}</text>
 </g>
 </svg>
