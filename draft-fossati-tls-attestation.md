@@ -58,9 +58,9 @@ author:
 normative:
   RFC2119:
   RFC8446:
-  I-D.ftbs-rats-msg-wrap:
-  I-D.bft-rats-kat: rats-kat
+  I-D.ietf-rats-msg-wrap: cmw
 informative:
+  I-D.bft-rats-kat: rats-kat
   RFC9334: rats-arch
   I-D.ietf-rats-eat:
   TPM1.2:
@@ -221,8 +221,7 @@ model is in use.
 
 When either the evidence or the attestation results extension is successfully
 negotiated, the content of the corresponding Certificate message contains a
-payload that is encoded based on the wrapper defined in
-{{I-D.ftbs-rats-msg-wrap}}.
+payload that is encoded based on the wrapper defined in {{-cmw}}.
 
 In TLS a client has to demonstrate possession of the private key via the
 CertificateVerify message, when client-based authentication is requested. The
@@ -503,8 +502,7 @@ model of {{RFC8446}}.
 ~~~~
 {: #figure-attest-only title="Certificate Message when using only attestation."}
 
-The encoding of the evidence structure is defined in
-{{I-D.ftbs-rats-msg-wrap}}.
+The encoding of the evidence structure is defined in {{-cmw}}.
 
 ## Attestation Alongside X.509 Certificates {#pkix-attest}
 
@@ -550,8 +548,7 @@ CertificateEntry extension, as shown in {{figure-cert-attest}}.
 ~~~~
 {: #figure-cert-attest title="Certificate Message when using PKIX and attestation."}
 
-The encoding of the evidence structure is defined in
-{{I-D.ftbs-rats-msg-wrap}}.
+The encoding of the evidence structure is defined in {{-cmw}}.
 
 As described in {{usage-variants}}, this authentication mechanism is meant
 primarily for carrying platform attestation evidence to provide more
