@@ -145,7 +145,7 @@ treatment when incorporated into the TLS handshake.
 
 The two models can be summarized as follows:
 
-- In the background check process, an attester provides evidence to a relying
+- In the background check model, an attester provides evidence to a relying
   party, who forwards it to a verifier for appraisal. The
   verifier then computes the attestation result and sends it back to the relying
   party. As the attestation evidence is generated and verified during the TLS
@@ -874,13 +874,14 @@ The client starts the TLS handshake with the server by supplying the
 attestation-related parameters it has obtained from the verifier.  If
 the server supports one of the offered evidence types, it will echo it
 in the specular extension and proceed by invoking a local API
-(symbolised by `attest_key(...)` in the figure below) to request
+(represented by `attest_key(...)` in the figure below) to request
 attestation using the nonce supplied by the verifier.  The returned
 evidence binds the identity key (TIK-S) with the platform identity and
 security state, packaged into a CAB.  The server then signs a transcript
-hash (`hs` in {{figure-cc-example}}) of the handshake context and the
-server's Certificate message with the (attested) identity key, and sends
-the attestation evidence together with the signature over to the client.
+hash (represented by `hs` in the figure below) of the handshake context
+and the server's Certificate message with the (attested) identity key,
+and sends the attestation evidence together with the signature over to
+the client.
 
 The client forwards the attestation evidence to the verifier using the
 previously established session, obtains the attestation result (AR) and
@@ -997,14 +998,12 @@ Certificate message the server has to request mutual authentication
 via the CertificateRequest message.
 
 The client, when receiving the EncryptedExtension with the
-evidence_proposal, will proceed by invoking a local API (symbolised by
-`attest_key(...)`) to request the attestation.  The returned evidence
-binds the identity key (TIK-C) with the workload and platform identity
-and security state, packaged into a CAB.  The client then signs a
-transcript hash (`hs` in {{figure-iot-example}}) of the handshake
-context and the client's Certificate message  with the (attested)
-identity key, and sends the evidence together with the signature over to
-the server.
+evidence_proposal, will proceed by invoking a local API to request the
+attestation.  The returned evidence binds the identity key (TIK-C) with
+the workload and platform identity and security state, packaged into a
+CAB.  The client then signs a transcript hash of the handshake context
+and the client's Certificate message  with the (attested) identity key,
+and sends the evidence together with the signature over to the server.
 
 The server forwards the attestation evidence to the verifier, obtains 
 the attestation result and checks that it is acceptable according to its 
