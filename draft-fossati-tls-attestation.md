@@ -152,10 +152,11 @@ The two models can be summarized as follows:
   handshake, it is essential to ensure the evidence's freshness and
   origin (refer to {{evidence-extensions}} for more details).
   
-- In the passport model, the attester transmits evidence to the verifier directly
-  and receives an attestation result, which is then relayed to the relying party.
-  Given that the credential is not expected to be generated in-band during the
-  handshake, fewer inter-protocol requirements must be satisfied (see
+- In the passport model, the attester transmits evidence to the verifier
+  directly and receives an attestation result, which is then relayed to
+  the relying party. Given that the attestation result is not expected
+  to be generated in-band during the handshake, fewer inter-protocol
+  requirements must be satisfied (see
   {{attestation-results-extensions}}).
 
 This specification supports both patterns. In the background check model, any
@@ -189,7 +190,7 @@ attestation evidence must contain the security state of both the signing key and
 of the platform hosting it. A Platform Attestation Service issues Platform
 Attestation Tokens (PAT) to prove that the Key Attestation Service has not been
 tampered with. The Key Attestation Service in turn issues Key Attestation Tokens
-(KAT) to prove that the signing key is secure, as described in {{-rats-kat}}. The
+(KAT) to prove that the signing key is secure, as described in {{handshake-overview}}. The
 security of the protocol critically depends on the verifiable binding between
 these two logically separate units of evidence.
 
@@ -272,7 +273,7 @@ Mutual authentication via attestation combines these two (non-interfering)
 flows, including cases where one of the peers uses the passport model for its
 attestation, and the other uses the background check model.
 
-## Handshake Overview
+## Handshake Overview {#handshake-overview}
 
 The handshake defined here is analogous to certificate-based authentication in a regular TLS handshake. Instead of the certificate's private key, we use
 the TIK identity key. This key is attested, with attestation being carried
@@ -872,13 +873,14 @@ understands and a nonce that will be used to challenge the attester.
 The client starts the TLS handshake with the server by supplying the
 attestation-related parameters it has obtained from the verifier.  If
 the server supports one of the offered evidence types, it will echo it
-in the specular extension and proceed by invoking the local API
-(`attest_key(...)`) to request attestation using the nonce supplied by
-the verifier.  The returned evidence binds the identity key (TIK) with
-the platform identity and security state, packaged into a CAB.  The
-server then signs the handshake transcript (`hs` in
-{{figure-cc-example}}) with the (attested) identity key, and sends the
-attestation evidence together with the signature over to the client.
+in the specular extension and proceed by invoking a local API
+(symbolised by `attest_key(...)` in the figure below) to request
+attestation using the nonce supplied by the verifier.  The returned
+evidence binds the identity key (TIK-S) with the platform identity and
+security state, packaged into a CAB.  The server then signs a transcript
+hash (`hs` in {{figure-cc-example}}) of the handshake context and the
+server's Certificate message with the (attested) identity key, and sends
+the attestation evidence together with the signature over to the client.
 
 The client forwards the attestation evidence to the verifier using the
 previously established session, obtains the attestation result (AR) and
@@ -921,14 +923,6 @@ confidential computing properties.
 |  |                    |    types(a,b,c)        |               |    |
 |  |                    |  )                     |               |    |
 |  |                    +----------------------->|               |    |
-|  |                    | ServerHello            |               |    |
-|  |                    |  {...}                 |               |    |
-|  |                    | EncryptedExtensions    |               |    |
-|  |                    |  {...}                 |               |    |
-|  |                    |  evidence_request(     |               |    |
-|  |                    |    type(a)             |               |    |
-|  |                    |  )                     |               |    |
-|  |                    |<-----------------------+               |    |
 |  |                    |                        | attest_key(   |    |
 |  |                    |                        |   nonce,      |    |
 |  |                    |                        |   TIK-S       |    |
@@ -936,11 +930,19 @@ confidential computing properties.
 |  |                    |                        +-------------->|    |
 |  |                    |                        | CAB(KAT, PAT) |    |
 |  |                    |                        |<--------------+    |
-|  |                    |                        | sign(TIK-S,hs)|    |
+|  |                    | ServerHello            |               |    |
+|  |                    |  {...}                 |               |    |
+|  |                    | EncryptedExtensions    |               |    |
+|  |                    |  {...}                 |               |    |
+|  |                    |  evidence_request(     |               |    |
+|  |                    |    type(a)             |               |    |
+|  |                    |  )                     |               |    |
+|  |                    | Certificate(KAT,PAT)   |               |    |
+|  |                    |<-----------------------+               |    |
+|  |                    |                        | sign(TIK,hs)  |    |
 |  |                    |                        +-------------->|    |
 |  |                    |                        |     sig       |    |
 |  |                    |                        |<--------------+    |
-|  |                    | Certificate(KAT,PAT)   |               |    |
 |  |                    | CertificateVerify(sig) |               |    |
 |  |                    | Finished               |               |    |
 |  |                    |<-----------------------+               |    |
@@ -994,12 +996,14 @@ selected evidence type. Since the evidence will be returned in the
 Certificate message the server has to request mutual authentication
 via the CertificateRequest message.
 
-The client, when receiving the EncryptedExtension with the 
-evidence_proposal, will proceed by invoking a local API to
-request the attestation.  The returned evidence binds the identity key
-with the workload and platform identity and security state.  The client
-then signs the handshake transcript with the (attested) identity key,
-and sends the evidence together with the signature over to
+The client, when receiving the EncryptedExtension with the
+evidence_proposal, will proceed by invoking a local API (symbolised by
+`attest_key(...)`) to request the attestation.  The returned evidence
+binds the identity key (TIK-C) with the workload and platform identity
+and security state, packaged into a CAB.  The client then signs a
+transcript hash (`hs` in {{figure-iot-example}}) of the handshake
+context and the client's Certificate message  with the (attested)
+identity key, and sends the evidence together with the signature over to
 the server.
 
 The server forwards the attestation evidence to the verifier, obtains 
@@ -1044,19 +1048,20 @@ the TLS server will terminate the exchange.
 |  |                |  )                     |                   |    |
 |  |                | CertificateRequest     |                   |    |
 |  |                | Certificate            |                   |    |
-|  |  attest_key(   | CertificateVerify      |                   |    |
-|  |    nonce,      | Finished               |                   |    |
-|  |    TIK-C       |<-----------------------+                   |    |
+|  |                | CertificateVerify      |                   |    |
+|  |  attest_key(   | Finished               |                   |    |
+|  |    nonce,      |<-----------------------+                   |    |
+|  |    TIK         |                        |                   |    |
 |  |  )             |                        |                   |    |
 |  |<---------------+                        |                   |    |
+|  |                |                        |                   |    |
 |  |  CAB(KAT, PAT) |                        |                   |    |
-|  +--------------->|                        |                   |    |
-|  | sign(TIK-C,hs) |                        |                   |    |
-|  |<---------------+                        |                   |    |
-|  |      sig       |                        |                   |    |
 |  +--------------->| Certificate(KAT,PAT)   |                   |    |
-|  |                | CertificateVerify(sig) |                   |    |
-|  |                | Finished               |                   |    |
+|  |                +----------------------->|                   |    |
+|  |  sign(TIK,hs)  |                        |                   |    |
+|  |<---------------+                        |                   |    |
+|  |      sig       | CertificateVerify(sig) |                   |    |
+|  +--------------->| Finished               |                   |    |
 |  |                +----------------------->|                   |    |
 |  |                |                        |                   |    |
 |  |                |                        | POST /76839A9E    |    |
