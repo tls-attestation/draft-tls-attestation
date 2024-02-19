@@ -1222,7 +1222,7 @@ li > p:last-of-type:only-child {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Tschofenig, et al.</td>
-<td class="center">Expires 21 August 2024</td>
+<td class="center">Expires 22 August 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1235,12 +1235,12 @@ li > p:last-of-type:only-child {
 <dd class="internet-draft">draft-fossati-tls-attestation-04</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-02-18" class="published">18 February 2024</time>
+<time datetime="2024-02-19" class="published">19 February 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-08-21">21 August 2024</time></dd>
+<dd class="expires"><time datetime="2024-08-22">22 August 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1307,7 +1307,7 @@ attestation.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 21 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 22 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1488,61 +1488,76 @@ attestation.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">The Remote ATtestation ProcedureS (RATS) architecture defines two basic types 
-of topological patterns to communicate between an attester, a relying party, and
-a verifier, namely the background-check model and the passport model. These two 
-models are fundamentally different and require a different treatment when 
-incorporated into the TLS handshake. For better readability we suggest to use different 
-extensions for these two models.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">The two models can be summarized as follows:<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-1">Secure channel establishment in TLS (<span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>) relies on
+authentication to afford each entity the confidence that exchanged data
+can only be accessed by the expected peer. When running a workload in a
+Trusted Execution Environment (TEE), the authentication process can be
+enhanced with remote attestation. Remote attestation allows the workload
+to offer guarantees about its security state, enabling more
+comprehensive security policies.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">The Remote ATtestation ProcedureS (RATS) architecture <span>[<a href="#RFC9334" class="cite xref">RFC9334</a>]</span> defines two
+basic topological patterns for communication between an attester, a relying
+party, and a verifier, namely the background-check model and the passport model.
+These two models are fundamentally different, and thus require a different
+treatment when incorporated into the TLS handshake.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">The two models can be summarized as follows:<a href="#section-1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-1-3.1">
-          <p id="section-1-3.1.1">In the background check model, the attester conveys evidence to the relying party,
-which then forwards the evidence to the verifier for appraisal; the verifier 
-computes the attestation result and sends it back to the relying party.<a href="#section-1-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-1-4.1">
+          <p id="section-1-4.1.1">In the background check model, an attester provides evidence to a relying
+party, who forwards it to a verifier for appraisal. The
+verifier then computes the attestation result and sends it back to the relying
+party. As the attestation evidence is generated and verified during the TLS
+handshake, it is essential to ensure the evidence's freshness and
+origin (refer to <a href="#evidence-extensions" class="auto internal xref">Section 5</a> for more details).<a href="#section-1-4.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-3.2">
-          <p id="section-1-3.2.1">In the passport model, the attester transmits evidence to the verifier 
-directly and receives attestation results, which are then relayed to the
-relying party.<a href="#section-1-3.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-1-4.2">
+          <p id="section-1-4.2.1">In the passport model, the attester transmits evidence to the verifier
+directly and receives an attestation result, which is then relayed to
+the relying party. Given that the attestation result is not expected
+to be generated in-band during the handshake, fewer inter-protocol
+requirements must be satisfied (see
+<a href="#attestation-results-extensions" class="auto internal xref">Section 6</a>).<a href="#section-1-4.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-4">This specification supports both patterns.<a href="#section-1-4" class="pilcrow">¶</a></p>
-<p id="section-1-5">Several formats for encoding evidence are available, such as:<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-5">This specification supports both patterns. In the background check model, any
+attestation technology characteristics, such as evidence encoding format and
+semantics of the evidence contents, are agnostic to the TLS handshake itself.
+Similarly, in the passport model, the characteristics of the attestation results,
+such as encoding format and trust relationships, are agnostic to the TLS
+handshake. Moreover, this specification allows both peers to authenticate
+themselves using remote attestation credentials, and for their attestation
+topologies to be independent of each other.<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-6">Several mechanisms for producing and encoding evidence are available, such as:<a href="#section-1-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-1-6.1">
-          <p id="section-1-6.1.1">the Entity Attestation Token (EAT) <span>[<a href="#I-D.ietf-rats-eat" class="cite xref">I-D.ietf-rats-eat</a>]</span>,<a href="#section-1-6.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-1-7.1">
+          <p id="section-1-7.1.1">the Entity Attestation Token (EAT) <span>[<a href="#I-D.ietf-rats-eat" class="cite xref">I-D.ietf-rats-eat</a>]</span>,<a href="#section-1-7.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-6.2">
-          <p id="section-1-6.2.1">the Trusted Platform Modules (TPMs) <span>[<a href="#TPM1.2" class="cite xref">TPM1.2</a>]</span> <span>[<a href="#TPM2.0" class="cite xref">TPM2.0</a>]</span>,<a href="#section-1-6.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-1-7.2">
+          <p id="section-1-7.2.1">the Trusted Platform Modules (TPMs) <span>[<a href="#TPM1.2" class="cite xref">TPM1.2</a>]</span> <span>[<a href="#TPM2.0" class="cite xref">TPM2.0</a>]</span>,<a href="#section-1-7.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-6.3">
-          <p id="section-1-6.3.1">the Android Key Attestation, and<a href="#section-1-6.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-1-7.3">
+          <p id="section-1-7.3.1">the Android Key Attestation, and<a href="#section-1-7.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-1-6.4">
-          <p id="section-1-6.4.1">Apple Key Attestation.<a href="#section-1-6.4.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-1-7.4">
+          <p id="section-1-7.4.1">Apple Key Attestation.<a href="#section-1-7.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-7">Likewise, there are different encodings available for attestation results. One
-such encoding, AR4SI <span>[<a href="#I-D.ietf-rats-ar4si" class="cite xref">I-D.ietf-rats-ar4si</a>]</span> is being standardized by the RATS
-working group.<a href="#section-1-7" class="pilcrow">¶</a></p>
-<p id="section-1-8">This specification supports both the background check and passport model, during
-TLS Handshake. In background check model the details about the attestation
-technology are agnostic to TLS handshake itself. Similarly, in the passport
-model, the details about the attestation results encoding and trust
-relationships are agnostic to the TLS handshake.<a href="#section-1-8" class="pilcrow">¶</a></p>
-<p id="section-1-9">To give the peer information that the handshake signing key is properly secured,
+<p id="section-1-8">Likewise, there are different encodings available for attestation results. One
+such encoding, AR4SI <span>[<a href="#I-D.ietf-rats-ar4si" class="cite xref">I-D.ietf-rats-ar4si</a>]</span>, is being standardized by the RATS
+working group.<a href="#section-1-8" class="pilcrow">¶</a></p>
+<p id="section-1-9">However, this document does not specify how different attestation technologies
+should be defined, only that they should all be usable within our framework.
+Attestation mechanisms must be defined by companion specifications.<a href="#section-1-9" class="pilcrow">¶</a></p>
+<p id="section-1-10">To give the peer information that the handshake signing key is properly secured,
 the associated attestation result has to be appraised by the peer. This must be
 the case when either of the two remote attestation topologies is used. Hence,
-the attestation evidence (to be appraised by the verifier) must contain the
-security state of the signing key as well as the overall platform. The platform
-attestation service ensures that the key attestation service has not been
-tampered with. The platform attestation service issues the Platform Attestation
-Token (PAT) and the key attestation service issues the Key Attestation Token
-(KAT). The security of the protocol critically depends on the verifiable binding
-between these two logically separate units of evidence.<a href="#section-1-9" class="pilcrow">¶</a></p>
-<p id="section-1-10">This document does not define how different attestation technologies are
-encoded. This is accomplished by companion specifications.<a href="#section-1-10" class="pilcrow">¶</a></p>
+attestation evidence must contain the security state of both the signing key and
+of the platform hosting it. A Platform Attestation Service issues Platform
+Attestation Tokens (PAT) to prove that the Key Attestation Service has not been
+tampered with. The Key Attestation Service in turn issues Key Attestation Tokens
+(KAT) to prove that the signing key is secure, as described in <a href="#handshake-overview" class="auto internal xref">Section 4.1</a>. The
+security of the protocol critically depends on the verifiable binding between
+these two logically separate units of evidence.<a href="#section-1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-terminology">
@@ -1849,7 +1864,7 @@ Auth | {CertificateVerify}
 </div>
 </section>
 </div>
-<div id="evidence-extensions-background-check-model">
+<div id="evidence-extensions">
 <section id="section-5">
       <h2 id="name-evidence-extensions-backgro">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-evidence-extensions-backgro" class="section-name selfRef">Evidence Extensions (Background Check Model)</a>
@@ -2063,7 +2078,7 @@ hashing is required for the binder.<a href="#section-5.2-9" class="pilcrow">¶</
 </div>
 </section>
 </div>
-<div id="attestation-results-extensions-passport-model">
+<div id="attestation-results-extensions">
 <section id="section-6">
       <h2 id="name-attestation-results-extensi">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-attestation-results-extensi" class="section-name selfRef">Attestation Results Extensions (Passport Model)</a>
@@ -2364,21 +2379,24 @@ at the same time that the secure channel is established.<a href="#section-8.1-4"
 party) while the TLS server is co-located with the TEE-hosted
 confidential workload (the attester).<a href="#section-8.1-5" class="pilcrow">¶</a></p>
 <p id="section-8.1-6">The flow starts with the client initiating a verification session with a
-trusted verifier.  The verifier returns the kinds of evidence it
+trusted verifier.  The verifier returns the evidence types it
 understands and a nonce that will be used to challenge the attester.<a href="#section-8.1-6" class="pilcrow">¶</a></p>
 <p id="section-8.1-7">The client starts the TLS handshake with the server by supplying the
 attestation-related parameters it has obtained from the verifier.  If
 the server supports one of the offered evidence types, it will echo it
-in the specular extension and proceed by invoking the local API to
-request the attestation.  The returned evidence binds the identity key
-with the platform identity and security state.  The server
-then signs the handshake transcript with the (attested) identity key,
+in the specular extension and proceed by invoking a local API
+(represented by <code>attest_key(...)</code> in the figure below) to request
+attestation using the nonce supplied by the verifier.  The returned
+evidence binds the identity key (TIK-S) with the platform identity and
+security state, packaged into a CAB.  The server then signs a transcript
+hash (represented by <code>hs</code> in the figure below) of the handshake context
+and the server's Certificate message with the (attested) identity key,
 and sends the attestation evidence together with the signature over to
 the client.<a href="#section-8.1-7" class="pilcrow">¶</a></p>
 <p id="section-8.1-8">The client forwards the attestation evidence to the verifier using the
-previously established session, obtains the attestation result and
-checks whether it is acceptable according to its local policy.  If so, it
-proceeds and verifies the handshake signature using the corresponding
+previously established session, obtains the attestation result (AR) and
+checks whether it is acceptable according to its local policy.  If so,
+it proceeds and verifies the handshake signature using the corresponding
 public key (for example, using the PoP key in the KAT evidence
 <span>[<a href="#I-D.bft-rats-kat" class="cite xref">I-D.bft-rats-kat</a>]</span>).<a href="#section-8.1-8" class="pilcrow">¶</a></p>
 <p id="section-8.1-9">The attestation evidence verification combined with the verification of
@@ -2420,11 +2438,11 @@ confidential computing properties.<a href="#section-8.1-9" class="pilcrow">¶</a
                 <path d="M 8,272 L 120,272" fill="none" stroke="black"></path>
                 <path d="M 8,304 L 552,304" fill="none" stroke="black"></path>
                 <path d="M 200,416 L 392,416" fill="none" stroke="black"></path>
-                <path d="M 208,544 L 400,544" fill="none" stroke="black"></path>
-                <path d="M 400,624 L 520,624" fill="none" stroke="black"></path>
-                <path d="M 408,656 L 528,656" fill="none" stroke="black"></path>
-                <path d="M 400,688 L 520,688" fill="none" stroke="black"></path>
-                <path d="M 408,720 L 528,720" fill="none" stroke="black"></path>
+                <path d="M 400,496 L 520,496" fill="none" stroke="black"></path>
+                <path d="M 408,528 L 528,528" fill="none" stroke="black"></path>
+                <path d="M 208,672 L 400,672" fill="none" stroke="black"></path>
+                <path d="M 400,704 L 520,704" fill="none" stroke="black"></path>
+                <path d="M 408,736 L 528,736" fill="none" stroke="black"></path>
                 <path d="M 208,784 L 400,784" fill="none" stroke="black"></path>
                 <path d="M 40,880 L 200,880" fill="none" stroke="black"></path>
                 <path d="M 32,944 L 192,944" fill="none" stroke="black"></path>
@@ -2443,10 +2461,10 @@ confidential computing properties.<a href="#section-8.1-9" class="pilcrow">¶</a
                 <path d="M 224,1040 C 232.83064,1040 240,1032.83064 240,1024" fill="none" stroke="black"></path>
                 <path d="M 24,1104 C 15.16936,1104 8,1096.83064 8,1088" fill="none" stroke="black"></path>
                 <path d="M 552,1104 C 560.83064,1104 568,1096.83064 568,1088" fill="none" stroke="black"></path>
-                <polygon class="arrowhead" points="528,688 516,682.4 516,693.6" fill="black" transform="rotate(0,520,688)"></polygon>
-                <polygon class="arrowhead" points="528,624 516,618.4 516,629.6" fill="black" transform="rotate(0,520,624)"></polygon>
-                <polygon class="arrowhead" points="416,720 404,714.4 404,725.6" fill="black" transform="rotate(180,408,720)"></polygon>
-                <polygon class="arrowhead" points="416,656 404,650.4 404,661.6" fill="black" transform="rotate(180,408,656)"></polygon>
+                <polygon class="arrowhead" points="528,704 516,698.4 516,709.6" fill="black" transform="rotate(0,520,704)"></polygon>
+                <polygon class="arrowhead" points="528,496 516,490.4 516,501.6" fill="black" transform="rotate(0,520,496)"></polygon>
+                <polygon class="arrowhead" points="416,736 404,730.4 404,741.6" fill="black" transform="rotate(180,408,736)"></polygon>
+                <polygon class="arrowhead" points="416,528 404,522.4 404,533.6" fill="black" transform="rotate(180,408,528)"></polygon>
                 <polygon class="arrowhead" points="400,1136 388,1130.4 388,1141.6" fill="black" transform="rotate(0,392,1136)"></polygon>
                 <polygon class="arrowhead" points="400,1072 388,1066.4 388,1077.6" fill="black" transform="rotate(0,392,1072)"></polygon>
                 <polygon class="arrowhead" points="400,416 388,410.4 388,421.6" fill="black" transform="rotate(0,392,416)"></polygon>
@@ -2454,7 +2472,7 @@ confidential computing properties.<a href="#section-8.1-9" class="pilcrow">¶</a
                 <polygon class="arrowhead" points="216,1040 204,1034.4 204,1045.6" fill="black" transform="rotate(180,208,1040)"></polygon>
                 <polygon class="arrowhead" points="216,992 204,986.4 204,997.6" fill="black" transform="rotate(180,208,992)"></polygon>
                 <polygon class="arrowhead" points="216,784 204,778.4 204,789.6" fill="black" transform="rotate(180,208,784)"></polygon>
-                <polygon class="arrowhead" points="216,544 204,538.4 204,549.6" fill="black" transform="rotate(180,208,544)"></polygon>
+                <polygon class="arrowhead" points="216,672 204,666.4 204,677.6" fill="black" transform="rotate(180,208,672)"></polygon>
                 <polygon class="arrowhead" points="200,944 188,938.4 188,949.6" fill="black" transform="rotate(0,192,944)"></polygon>
                 <polygon class="arrowhead" points="200,240 188,234.4 188,245.6" fill="black" transform="rotate(0,192,240)"></polygon>
                 <polygon class="arrowhead" points="48,880 36,874.4 36,885.6" fill="black" transform="rotate(180,40,880)"></polygon>
@@ -2484,22 +2502,22 @@ confidential computing properties.<a href="#section-8.1-9" class="pilcrow">¶</a
                   <text x="256" y="372">nonce</text>
                   <text x="284" y="388">types(a,b,c)</text>
                   <text x="224" y="404">)</text>
-                  <text x="256" y="436">ServerHello</text>
-                  <text x="240" y="452">{...}</text>
-                  <text x="288" y="468">EncryptedExtensions</text>
-                  <text x="240" y="484">{...}</text>
-                  <text x="288" y="500">evidence_request(</text>
-                  <text x="264" y="516">type(a)</text>
-                  <text x="224" y="532">)</text>
-                  <text x="456" y="564">attest_key(</text>
-                  <text x="452" y="580">nonce,</text>
-                  <text x="448" y="596">TIK-S</text>
-                  <text x="416" y="612">)</text>
-                  <text x="444" y="644">CAB(KAT,</text>
-                  <text x="500" y="644">PAT)</text>
-                  <text x="468" y="676">sign(TIK-S,hs)</text>
-                  <text x="456" y="708">sig</text>
-                  <text x="292" y="740">Certificate(KAT,PAT)</text>
+                  <text x="456" y="436">attest_key(</text>
+                  <text x="452" y="452">nonce,</text>
+                  <text x="448" y="468">TIK-S</text>
+                  <text x="416" y="484">)</text>
+                  <text x="444" y="516">CAB(KAT,</text>
+                  <text x="500" y="516">PAT)</text>
+                  <text x="256" y="548">ServerHello</text>
+                  <text x="240" y="564">{...}</text>
+                  <text x="288" y="580">EncryptedExtensions</text>
+                  <text x="240" y="596">{...}</text>
+                  <text x="288" y="612">evidence_request(</text>
+                  <text x="264" y="628">type(a)</text>
+                  <text x="224" y="644">)</text>
+                  <text x="292" y="660">Certificate(KAT,PAT)</text>
+                  <text x="468" y="692">sign(TIK-S,hs)</text>
+                  <text x="456" y="724">sig</text>
                   <text x="300" y="756">CertificateVerify(sig)</text>
                   <text x="244" y="772">Finished</text>
                   <text x="60" y="804">POST</text>
@@ -2553,13 +2571,13 @@ reserved nonce range, and returns it to the client alongside the
 selected evidence type. Since the evidence will be returned in the
 Certificate message the server has to request mutual authentication
 via the CertificateRequest message.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
-<p id="section-8.2-6">The client, when receiving the EncryptedExtension with the 
-evidence_proposal, will proceed by invoking a local API to
-request the attestation.  The returned evidence binds the identity key
-with the workload and platform identity and security state.  The client
-then signs the handshake transcript with the (attested) identity key,
-and sends the evidence together with the signature over to
-the server.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
+<p id="section-8.2-6">The client, when receiving the EncryptedExtension with the
+evidence_proposal, will proceed by invoking a local API to request the
+attestation.  The returned evidence binds the identity key (TIK-C) with
+the workload and platform identity and security state, packaged into a
+CAB.  The client then signs a transcript hash of the handshake context
+and the client's Certificate message  with the (attested) identity key,
+and sends the evidence together with the signature over to the server.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
 <p id="section-8.2-7">The server forwards the attestation evidence to the verifier, obtains 
 the attestation result and checks that it is acceptable according to its 
 local policy. The evidence verification combined with the verification of
@@ -2573,23 +2591,23 @@ the TLS server will terminate the exchange.<a href="#section-8.2-8" class="pilcr
 <figure id="figure-13">
           <div id="section-8.2-9.1">
             <div class="alignLeft art-svg artwork" id="section-8.2-9.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="1136" width="576" viewBox="0 0 576 1136" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="1152" width="576" viewBox="0 0 576 1152" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 8,32 L 8,80" fill="none" stroke="black"></path>
-                <path d="M 8,112 L 8,1072" fill="none" stroke="black"></path>
+                <path d="M 8,112 L 8,1088" fill="none" stroke="black"></path>
                 <path d="M 32,80 L 32,112" fill="none" stroke="black"></path>
-                <path d="M 32,144 L 32,1072" fill="none" stroke="black"></path>
+                <path d="M 32,144 L 32,1088" fill="none" stroke="black"></path>
                 <path d="M 136,40 L 136,72" fill="none" stroke="black"></path>
                 <path d="M 136,128 L 136,144" fill="none" stroke="black"></path>
-                <path d="M 168,80 L 168,1120" fill="none" stroke="black"></path>
+                <path d="M 168,80 L 168,1136" fill="none" stroke="black"></path>
                 <path d="M 224,32 L 224,80" fill="none" stroke="black"></path>
                 <path d="M 328,48 L 328,80" fill="none" stroke="black"></path>
-                <path d="M 368,80 L 368,1120" fill="none" stroke="black"></path>
+                <path d="M 368,80 L 368,1136" fill="none" stroke="black"></path>
                 <path d="M 400,48 L 400,80" fill="none" stroke="black"></path>
                 <path d="M 440,368 L 440,376" fill="none" stroke="black"></path>
                 <path d="M 480,48 L 480,80" fill="none" stroke="black"></path>
-                <path d="M 528,80 L 528,1072" fill="none" stroke="black"></path>
+                <path d="M 528,80 L 528,1088" fill="none" stroke="black"></path>
                 <path d="M 568,48 L 568,80" fill="none" stroke="black"></path>
-                <path d="M 568,160 L 568,1056" fill="none" stroke="black"></path>
+                <path d="M 568,160 L 568,1072" fill="none" stroke="black"></path>
                 <path d="M 8,32 L 224,32" fill="none" stroke="black"></path>
                 <path d="M 328,48 L 400,48" fill="none" stroke="black"></path>
                 <path d="M 480,48 L 568,48" fill="none" stroke="black"></path>
@@ -2602,41 +2620,43 @@ the TLS server will terminate the exchange.<a href="#section-8.2-8" class="pilcr
                 <path d="M 368,304 L 520,304" fill="none" stroke="black"></path>
                 <path d="M 376,416 L 528,416" fill="none" stroke="black"></path>
                 <path d="M 176,544 L 368,544" fill="none" stroke="black"></path>
-                <path d="M 40,576 L 168,576" fill="none" stroke="black"></path>
-                <path d="M 32,608 L 160,608" fill="none" stroke="black"></path>
-                <path d="M 40,640 L 168,640" fill="none" stroke="black"></path>
-                <path d="M 32,672 L 160,672" fill="none" stroke="black"></path>
-                <path d="M 168,720 L 360,720" fill="none" stroke="black"></path>
-                <path d="M 368,832 L 520,832" fill="none" stroke="black"></path>
-                <path d="M 376,896 L 528,896" fill="none" stroke="black"></path>
-                <path d="M 368,912 L 392,912" fill="none" stroke="black"></path>
-                <path d="M 376,944 L 392,944" fill="none" stroke="black"></path>
-                <path d="M 368,960 L 392,960" fill="none" stroke="black"></path>
-                <path d="M 376,992 L 392,992" fill="none" stroke="black"></path>
-                <path d="M 8,1072 L 552,1072" fill="none" stroke="black"></path>
-                <path d="M 176,1104 L 360,1104" fill="none" stroke="black"></path>
+                <path d="M 40,592 L 168,592" fill="none" stroke="black"></path>
+                <path d="M 32,640 L 160,640" fill="none" stroke="black"></path>
+                <path d="M 168,656 L 360,656" fill="none" stroke="black"></path>
+                <path d="M 40,688 L 168,688" fill="none" stroke="black"></path>
+                <path d="M 32,720 L 160,720" fill="none" stroke="black"></path>
+                <path d="M 168,736 L 360,736" fill="none" stroke="black"></path>
+                <path d="M 368,848 L 520,848" fill="none" stroke="black"></path>
+                <path d="M 376,912 L 528,912" fill="none" stroke="black"></path>
+                <path d="M 368,928 L 392,928" fill="none" stroke="black"></path>
+                <path d="M 376,960 L 392,960" fill="none" stroke="black"></path>
+                <path d="M 368,976 L 392,976" fill="none" stroke="black"></path>
+                <path d="M 376,1008 L 392,1008" fill="none" stroke="black"></path>
+                <path d="M 8,1088 L 552,1088" fill="none" stroke="black"></path>
+                <path d="M 176,1120 L 360,1120" fill="none" stroke="black"></path>
                 <path d="M 120,112 C 128.83064,112 136,119.16936 136,128" fill="none" stroke="black"></path>
                 <path d="M 552,144 C 560.83064,144 568,151.16936 568,160" fill="none" stroke="black"></path>
-                <path d="M 392,912 C 400.83064,912 408,919.16936 408,928" fill="none" stroke="black"></path>
-                <path d="M 392,944 C 400.83064,944 408,936.83064 408,928" fill="none" stroke="black"></path>
-                <path d="M 392,960 C 400.83064,960 408,967.16936 408,976" fill="none" stroke="black"></path>
-                <path d="M 392,992 C 400.83064,992 408,984.83064 408,976" fill="none" stroke="black"></path>
-                <path d="M 552,1072 C 560.83064,1072 568,1064.83064 568,1056" fill="none" stroke="black"></path>
-                <polygon class="arrowhead" points="528,832 516,826.4 516,837.6" fill="black" transform="rotate(0,520,832)"></polygon>
+                <path d="M 392,928 C 400.83064,928 408,935.16936 408,944" fill="none" stroke="black"></path>
+                <path d="M 392,960 C 400.83064,960 408,952.83064 408,944" fill="none" stroke="black"></path>
+                <path d="M 392,976 C 400.83064,976 408,983.16936 408,992" fill="none" stroke="black"></path>
+                <path d="M 392,1008 C 400.83064,1008 408,1000.83064 408,992" fill="none" stroke="black"></path>
+                <path d="M 552,1088 C 560.83064,1088 568,1080.83064 568,1072" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="528,848 516,842.4 516,853.6" fill="black" transform="rotate(0,520,848)"></polygon>
                 <polygon class="arrowhead" points="528,304 516,298.4 516,309.6" fill="black" transform="rotate(0,520,304)"></polygon>
-                <polygon class="arrowhead" points="384,992 372,986.4 372,997.6" fill="black" transform="rotate(180,376,992)"></polygon>
-                <polygon class="arrowhead" points="384,944 372,938.4 372,949.6" fill="black" transform="rotate(180,376,944)"></polygon>
-                <polygon class="arrowhead" points="384,896 372,890.4 372,901.6" fill="black" transform="rotate(180,376,896)"></polygon>
+                <polygon class="arrowhead" points="384,1008 372,1002.4 372,1013.6" fill="black" transform="rotate(180,376,1008)"></polygon>
+                <polygon class="arrowhead" points="384,960 372,954.4 372,965.6" fill="black" transform="rotate(180,376,960)"></polygon>
+                <polygon class="arrowhead" points="384,912 372,906.4 372,917.6" fill="black" transform="rotate(180,376,912)"></polygon>
                 <polygon class="arrowhead" points="384,416 372,410.4 372,421.6" fill="black" transform="rotate(180,376,416)"></polygon>
-                <polygon class="arrowhead" points="368,1104 356,1098.4 356,1109.6" fill="black" transform="rotate(0,360,1104)"></polygon>
-                <polygon class="arrowhead" points="368,720 356,714.4 356,725.6" fill="black" transform="rotate(0,360,720)"></polygon>
+                <polygon class="arrowhead" points="368,1120 356,1114.4 356,1125.6" fill="black" transform="rotate(0,360,1120)"></polygon>
+                <polygon class="arrowhead" points="368,736 356,730.4 356,741.6" fill="black" transform="rotate(0,360,736)"></polygon>
+                <polygon class="arrowhead" points="368,656 356,650.4 356,661.6" fill="black" transform="rotate(0,360,656)"></polygon>
                 <polygon class="arrowhead" points="368,256 356,250.4 356,261.6" fill="black" transform="rotate(0,360,256)"></polygon>
-                <polygon class="arrowhead" points="184,1104 172,1098.4 172,1109.6" fill="black" transform="rotate(180,176,1104)"></polygon>
+                <polygon class="arrowhead" points="184,1120 172,1114.4 172,1125.6" fill="black" transform="rotate(180,176,1120)"></polygon>
                 <polygon class="arrowhead" points="184,544 172,538.4 172,549.6" fill="black" transform="rotate(180,176,544)"></polygon>
-                <polygon class="arrowhead" points="168,672 156,666.4 156,677.6" fill="black" transform="rotate(0,160,672)"></polygon>
-                <polygon class="arrowhead" points="168,608 156,602.4 156,613.6" fill="black" transform="rotate(0,160,608)"></polygon>
-                <polygon class="arrowhead" points="48,640 36,634.4 36,645.6" fill="black" transform="rotate(180,40,640)"></polygon>
-                <polygon class="arrowhead" points="48,576 36,570.4 36,581.6" fill="black" transform="rotate(180,40,576)"></polygon>
+                <polygon class="arrowhead" points="168,720 156,714.4 156,725.6" fill="black" transform="rotate(0,160,720)"></polygon>
+                <polygon class="arrowhead" points="168,640 156,634.4 156,645.6" fill="black" transform="rotate(0,160,640)"></polygon>
+                <polygon class="arrowhead" points="48,688 36,682.4 36,693.6" fill="black" transform="rotate(180,40,688)"></polygon>
+                <polygon class="arrowhead" points="48,592 36,586.4 36,597.6" fill="black" transform="rotate(180,40,592)"></polygon>
                 <g class="text">
                   <text x="64" y="52">Attestation</text>
                   <text x="180" y="52">Client</text>
@@ -2671,37 +2691,37 @@ the TLS server will terminate the exchange.<a href="#section-8.2-8" class="pilcr
                   <text x="192" y="468">)</text>
                   <text x="252" y="484">CertificateRequest</text>
                   <text x="224" y="500">Certificate</text>
-                  <text x="96" y="516">attest_key(</text>
                   <text x="248" y="516">CertificateVerify</text>
-                  <text x="92" y="532">nonce,</text>
+                  <text x="96" y="532">attest_key(</text>
                   <text x="212" y="532">Finished</text>
-                  <text x="88" y="548">TIK-C</text>
-                  <text x="56" y="564">)</text>
-                  <text x="84" y="596">CAB(KAT,</text>
-                  <text x="140" y="596">PAT)</text>
-                  <text x="100" y="628">sign(TIK-C,hs)</text>
-                  <text x="96" y="660">sig</text>
-                  <text x="260" y="676">Certificate(KAT,PAT)</text>
-                  <text x="268" y="692">CertificateVerify(sig)</text>
-                  <text x="212" y="708">Finished</text>
-                  <text x="396" y="756">POST</text>
-                  <text x="456" y="756">/76839A9E</text>
-                  <text x="400" y="772">Body:</text>
-                  <text x="432" y="772">{</text>
-                  <text x="428" y="788">type(a),</text>
-                  <text x="408" y="804">CAB</text>
-                  <text x="384" y="820">}</text>
-                  <text x="400" y="852">Body:</text>
-                  <text x="432" y="852">{</text>
-                  <text x="432" y="868">att-result:</text>
-                  <text x="500" y="868">AR{}</text>
-                  <text x="384" y="884">}</text>
-                  <text x="444" y="932">verify</text>
-                  <text x="492" y="932">AR{}</text>
-                  <text x="444" y="980">verify</text>
-                  <text x="488" y="980">sig</text>
-                  <text x="248" y="1092">application</text>
-                  <text x="316" y="1092">data</text>
+                  <text x="92" y="548">nonce,</text>
+                  <text x="88" y="564">TIK-C</text>
+                  <text x="56" y="580">)</text>
+                  <text x="84" y="628">CAB(KAT,</text>
+                  <text x="140" y="628">PAT)</text>
+                  <text x="260" y="644">Certificate(KAT,PAT)</text>
+                  <text x="100" y="676">sign(TIK-C,hs)</text>
+                  <text x="96" y="708">sig</text>
+                  <text x="268" y="708">CertificateVerify(sig)</text>
+                  <text x="212" y="724">Finished</text>
+                  <text x="396" y="772">POST</text>
+                  <text x="456" y="772">/76839A9E</text>
+                  <text x="400" y="788">Body:</text>
+                  <text x="432" y="788">{</text>
+                  <text x="428" y="804">type(a),</text>
+                  <text x="408" y="820">CAB</text>
+                  <text x="384" y="836">}</text>
+                  <text x="400" y="868">Body:</text>
+                  <text x="432" y="868">{</text>
+                  <text x="432" y="884">att-result:</text>
+                  <text x="500" y="884">AR{}</text>
+                  <text x="384" y="900">}</text>
+                  <text x="444" y="948">verify</text>
+                  <text x="492" y="948">AR{}</text>
+                  <text x="444" y="996">verify</text>
+                  <text x="488" y="996">sig</text>
+                  <text x="248" y="1108">application</text>
+                  <text x="316" y="1108">data</text>
                 </g>
               </svg><a href="#section-8.2-9.1.1" class="pilcrow">¶</a>
 </div>
