@@ -940,7 +940,7 @@ confidential computing properties.
 |  |                    |  )                     |               |    |
 |  |                    | Certificate(KAT,PAT)   |               |    |
 |  |                    |<-----------------------+               |    |
-|  |                    |                        | sign(TIK,hs)  |    |
+|  |                    |                        | sign(TIK-S,hs)|    |
 |  |                    |                        +-------------->|    |
 |  |                    |                        |     sig       |    |
 |  |                    |                        |<--------------+    |
@@ -1050,14 +1050,14 @@ the TLS server will terminate the exchange.
 |  |                | CertificateVerify      |                   |    |
 |  |  attest_key(   | Finished               |                   |    |
 |  |    nonce,      |<-----------------------+                   |    |
-|  |    TIK         |                        |                   |    |
+|  |    TIK-C       |                        |                   |    |
 |  |  )             |                        |                   |    |
 |  |<---------------+                        |                   |    |
 |  |                |                        |                   |    |
 |  |  CAB(KAT, PAT) |                        |                   |    |
 |  +--------------->| Certificate(KAT,PAT)   |                   |    |
 |  |                +----------------------->|                   |    |
-|  |  sign(TIK,hs)  |                        |                   |    |
+|  | sign(TIK-C,hs) |                        |                   |    |
 |  |<---------------+                        |                   |    |
 |  |      sig       | CertificateVerify(sig) |                   |    |
 |  +--------------->| Finished               |                   |    |
