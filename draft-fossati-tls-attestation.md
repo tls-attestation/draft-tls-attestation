@@ -129,26 +129,46 @@ attestation.
 
 #  Introduction
 
-The Remote ATtestation ProcedureS (RATS) architecture defines two basic types 
-of topological patterns to communicate between an attester, a relying party, and
-a verifier, namely the background-check model and the passport model. These two 
-models are fundamentally different and require a different treatment when 
-incorporated into the TLS handshake. For better readability we suggest to use different 
-extensions for these two models.
+Secure channel establishment in TLS ({{RFC8446}}) relies on
+authentication to afford each entity the confidence that exchanged data
+can only be accessed by the expected peer. When running a workload in a
+Trusted Execution Environment (TEE), the authentication process can be
+enhanced with remote attestation. Remote attestation allows the workload
+to offer guarantees about its security state, enabling more
+comprehensive security policies.
+
+The Remote ATtestation ProcedureS (RATS) architecture {{-rats-arch}} defines two
+basic topological patterns for communication between an attester, a relying
+party, and a verifier, namely the background-check model and the passport model.
+These two models are fundamentally different, and thus require a different
+treatment when incorporated into the TLS handshake.
 
 The two models can be summarized as follows:
 
-- In the background check model, the attester conveys evidence to the relying party,
-  which then forwards the evidence to the verifier for appraisal; the verifier 
-  computes the attestation result and sends it back to the relying party.
+- In the background check model, an attester provides evidence to a relying
+  party, who forwards it to a verifier for appraisal. The
+  verifier then computes the attestation result and sends it back to the relying
+  party. As the attestation evidence is generated and verified during the TLS
+  handshake, it is essential to ensure the evidence's freshness and
+  origin (refer to {{evidence-extensions}} for more details).
   
-- In the passport model, the attester transmits evidence to the verifier 
-  directly and receives attestation results, which are then relayed to the
-  relying party.
+- In the passport model, the attester transmits evidence to the verifier
+  directly and receives an attestation result, which is then relayed to
+  the relying party. Given that the attestation result is not expected
+  to be generated in-band during the handshake, fewer inter-protocol
+  requirements must be satisfied (see
+  {{attestation-results-extensions}}).
 
-This specification supports both patterns.
+This specification supports both patterns. In the background check model, any
+attestation technology characteristics, such as evidence encoding format and
+semantics of the evidence contents, are agnostic to the TLS handshake itself.
+Similarly, in the passport model, the characteristics of the attestation results,
+such as encoding format and trust relationships, are agnostic to the TLS
+handshake. Moreover, this specification allows both peers to authenticate
+themselves using remote attestation credentials, and for their attestation
+topologies to be independent of each other.
 
-Several formats for encoding evidence are available, such as:
+Several mechanisms for producing and encoding evidence are available, such as:
 
 - the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}, 
 - the Trusted Platform Modules (TPMs) {{TPM1.2}} {{TPM2.0}},
@@ -156,28 +176,23 @@ Several formats for encoding evidence are available, such as:
 - Apple Key Attestation. 
 
 Likewise, there are different encodings available for attestation results. One
-such encoding, AR4SI {{?I-D.ietf-rats-ar4si}} is being standardized by the RATS
+such encoding, AR4SI {{?I-D.ietf-rats-ar4si}}, is being standardized by the RATS
 working group.
 
-This specification supports both the background check and passport model, during
-TLS Handshake. In background check model the details about the attestation
-technology are agnostic to TLS handshake itself. Similarly, in the passport
-model, the details about the attestation results encoding and trust
-relationships are agnostic to the TLS handshake.
+However, this document does not specify how different attestation technologies
+should be defined, only that they should all be usable within our framework.
+Attestation mechanisms must be defined by companion specifications.
 
 To give the peer information that the handshake signing key is properly secured,
 the associated attestation result has to be appraised by the peer. This must be
 the case when either of the two remote attestation topologies is used. Hence,
-the attestation evidence (to be appraised by the verifier) must contain the
-security state of the signing key as well as the overall platform. The platform
-attestation service ensures that the key attestation service has not been
-tampered with. The platform attestation service issues the Platform Attestation
-Token (PAT) and the key attestation service issues the Key Attestation Token
-(KAT). The security of the protocol critically depends on the verifiable binding
-between these two logically separate units of evidence.
-
-This document does not define how different attestation technologies are
-encoded. This is accomplished by companion specifications.
+attestation evidence must contain the security state of both the signing key and
+of the platform hosting it. A Platform Attestation Service issues Platform
+Attestation Tokens (PAT) to prove that the Key Attestation Service has not been
+tampered with. The Key Attestation Service in turn issues Key Attestation Tokens
+(KAT) to prove that the signing key is secure, as described in {{handshake-overview}}. The
+security of the protocol critically depends on the verifiable binding between
+these two logically separate units of evidence.
 
 # Conventions and Terminology
 
@@ -257,7 +272,7 @@ Mutual authentication via attestation combines these two (non-interfering)
 flows, including cases where one of the peers uses the passport model for its
 attestation, and the other uses the background check model.
 
-## Handshake Overview
+## Handshake Overview {#handshake-overview}
 
 The handshake defined here is analogous to certificate-based authentication in a regular TLS handshake. Instead of the certificate's private key, we use
 the TIK identity key. This key is attested, with attestation being carried
@@ -425,7 +440,7 @@ Auth | {CertificateVerify}
 ~~~~
 {: #figure-passport-model2 title="TLS Server Providing Attestation Results to TLS Client."}
 
-# Evidence Extensions (Background Check Model)
+# Evidence Extensions (Background Check Model) {#evidence-extensions}
 
 The EvidenceType structure also contains an indicator for the type of credential
 expected in the Certificate message. The credential can either contain
@@ -596,7 +611,7 @@ to hashing, the binder must be encoded as described in {{binding-mech}}.
 The hash algorithm negotiatied within the handshake must be used wherever
 hashing is required for the binder.
 
-# Attestation Results Extensions (Passport Model)
+# Attestation Results Extensions (Passport Model) {#attestation-results-extensions}
 
 ~~~~
    struct {
@@ -849,23 +864,26 @@ party) while the TLS server is co-located with the TEE-hosted
 confidential workload (the attester).
 
 The flow starts with the client initiating a verification session with a
-trusted verifier.  The verifier returns the kinds of evidence it
+trusted verifier.  The verifier returns the evidence types it
 understands and a nonce that will be used to challenge the attester.
 
 The client starts the TLS handshake with the server by supplying the
 attestation-related parameters it has obtained from the verifier.  If
 the server supports one of the offered evidence types, it will echo it
-in the specular extension and proceed by invoking the local API to
-request the attestation.  The returned evidence binds the identity key
-with the platform identity and security state.  The server
-then signs the handshake transcript with the (attested) identity key,
+in the specular extension and proceed by invoking a local API
+(represented by `attest_key(...)` in the figure below) to request
+attestation using the nonce supplied by the verifier.  The returned
+evidence binds the identity key (TIK-S) with the platform identity and
+security state, packaged into a CAB.  The server then signs a transcript
+hash (represented by `hs` in the figure below) of the handshake context
+and the server's Certificate message with the (attested) identity key,
 and sends the attestation evidence together with the signature over to
 the client.
 
 The client forwards the attestation evidence to the verifier using the
-previously established session, obtains the attestation result and
-checks whether it is acceptable according to its local policy.  If so, it
-proceeds and verifies the handshake signature using the corresponding
+previously established session, obtains the attestation result (AR) and
+checks whether it is acceptable according to its local policy.  If so,
+it proceeds and verifies the handshake signature using the corresponding
 public key (for example, using the PoP key in the KAT evidence
 {{I-D.bft-rats-kat}}).
 
@@ -903,14 +921,6 @@ confidential computing properties.
 |  |                    |    types(a,b,c)        |               |    |
 |  |                    |  )                     |               |    |
 |  |                    +----------------------->|               |    |
-|  |                    | ServerHello            |               |    |
-|  |                    |  {...}                 |               |    |
-|  |                    | EncryptedExtensions    |               |    |
-|  |                    |  {...}                 |               |    |
-|  |                    |  evidence_request(     |               |    |
-|  |                    |    type(a)             |               |    |
-|  |                    |  )                     |               |    |
-|  |                    |<-----------------------+               |    |
 |  |                    |                        | attest_key(   |    |
 |  |                    |                        |   nonce,      |    |
 |  |                    |                        |   TIK-S       |    |
@@ -918,11 +928,19 @@ confidential computing properties.
 |  |                    |                        +-------------->|    |
 |  |                    |                        | CAB(KAT, PAT) |    |
 |  |                    |                        |<--------------+    |
+|  |                    | ServerHello            |               |    |
+|  |                    |  {...}                 |               |    |
+|  |                    | EncryptedExtensions    |               |    |
+|  |                    |  {...}                 |               |    |
+|  |                    |  evidence_request(     |               |    |
+|  |                    |    type(a)             |               |    |
+|  |                    |  )                     |               |    |
+|  |                    | Certificate(KAT,PAT)   |               |    |
+|  |                    |<-----------------------+               |    |
 |  |                    |                        | sign(TIK-S,hs)|    |
 |  |                    |                        +-------------->|    |
 |  |                    |                        |     sig       |    |
 |  |                    |                        |<--------------+    |
-|  |                    | Certificate(KAT,PAT)   |               |    |
 |  |                    | CertificateVerify(sig) |               |    |
 |  |                    | Finished               |               |    |
 |  |                    |<-----------------------+               |    |
@@ -976,13 +994,13 @@ selected evidence type. Since the evidence will be returned in the
 Certificate message the server has to request mutual authentication
 via the CertificateRequest message.
 
-The client, when receiving the EncryptedExtension with the 
-evidence_proposal, will proceed by invoking a local API to
-request the attestation.  The returned evidence binds the identity key
-with the workload and platform identity and security state.  The client
-then signs the handshake transcript with the (attested) identity key,
-and sends the evidence together with the signature over to
-the server.
+The client, when receiving the EncryptedExtension with the
+evidence_proposal, will proceed by invoking a local API to request the
+attestation.  The returned evidence binds the identity key (TIK-C) with
+the workload and platform identity and security state, packaged into a
+CAB.  The client then signs a transcript hash of the handshake context
+and the client's Certificate message  with the (attested) identity key,
+and sends the evidence together with the signature over to the server.
 
 The server forwards the attestation evidence to the verifier, obtains 
 the attestation result and checks that it is acceptable according to its 
@@ -1026,19 +1044,20 @@ the TLS server will terminate the exchange.
 |  |                |  )                     |                   |    |
 |  |                | CertificateRequest     |                   |    |
 |  |                | Certificate            |                   |    |
-|  |  attest_key(   | CertificateVerify      |                   |    |
-|  |    nonce,      | Finished               |                   |    |
-|  |    TIK-C       |<-----------------------+                   |    |
+|  |                | CertificateVerify      |                   |    |
+|  |  attest_key(   | Finished               |                   |    |
+|  |    nonce,      |<-----------------------+                   |    |
+|  |    TIK-C       |                        |                   |    |
 |  |  )             |                        |                   |    |
 |  |<---------------+                        |                   |    |
+|  |                |                        |                   |    |
 |  |  CAB(KAT, PAT) |                        |                   |    |
-|  +--------------->|                        |                   |    |
+|  +--------------->| Certificate(KAT,PAT)   |                   |    |
+|  |                +----------------------->|                   |    |
 |  | sign(TIK-C,hs) |                        |                   |    |
 |  |<---------------+                        |                   |    |
-|  |      sig       |                        |                   |    |
-|  +--------------->| Certificate(KAT,PAT)   |                   |    |
-|  |                | CertificateVerify(sig) |                   |    |
-|  |                | Finished               |                   |    |
+|  |      sig       | CertificateVerify(sig) |                   |    |
+|  +--------------->| Finished               |                   |    |
 |  |                +----------------------->|                   |    |
 |  |                |                        |                   |    |
 |  |                |                        | POST /76839A9E    |    |
