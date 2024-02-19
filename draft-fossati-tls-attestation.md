@@ -466,7 +466,7 @@ evidence.
            select(ClientOrServerExtension) {
                case client:
                  EvidenceType supported_evidence_types<1..2^8-1>;
-                 opaque nonce<0..2^8-1>;
+                 opaque nonce<8..2^8-1>;
                  
                case server:
                  EvidenceType selected_evidence_type;
@@ -480,7 +480,7 @@ evidence.
 
                case server:
                  EvidenceType selected_evidence_type;
-                 opaque nonce<0..2^8-1>;
+                 opaque nonce<8..2^8-1>;
            }
    } evidenceProposalTypeExtension;
 ~~~~
