@@ -133,6 +133,7 @@ This, in turn, allows for the implementation of authorization policies at the re
 
 Given the variety of deployed and emerging attestation technologies (e.g., {{TPM1.2}}, {{TPM2.0}}, {{-rats-eat}}) these extensions have been explicitly designed to be agnostic of the attestation formats.
 This is achieved by reusing the generic encapsulation defined in {{-cmw}} for transporting evidence and attestation result payloads in the TLS Certificate message.
+
 The proposed design supports both background-check and passport topologies, as described in {{Sections 5.2 and 5.1 of -rats-arch}}.
 This is detailed in {{evidence-extensions}} and {{attestation-results-extensions}}.
 This specification provides both one-way (server-only) and mutual (client and server) authentication using attestation credentials, and allows the attestation topologies at each peer to be independent of each other.
