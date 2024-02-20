@@ -57,12 +57,13 @@ author:
 
 normative:
   RFC2119:
-  RFC8446:
+  RFC8446: tls13
   I-D.ietf-rats-msg-wrap: cmw
 informative:
   I-D.bft-rats-kat: rats-kat
   RFC9334: rats-arch
-  I-D.ietf-rats-eat:
+  I-D.ietf-rats-eat: rats-eat
+  I-D.ietf-rats-ar4si: rats-ar4si
   TPM1.2:
     target: https://trustedcomputinggroup.org/resource/tpm-main-specification/
     title: TPM Main Specification Level 2 Version 1.2, Revision 116
@@ -113,88 +114,36 @@ informative:
 
 --- abstract
 
-Attestation is the process by which an entity produces evidence about itself
-that another party can use to evaluate the trustworthiness of that entity.
-
-In use cases that require the use of remote attestation, such as confidential computing
-or device onboarding, an attester has to convey evidence or attestation results to 
-a relying party. This information exchange may happen at different layers in the 
-protocol stack. 
-
-This specification provides a generic way of passing evidence and attestation results
-in the TLS handshake. Functionality-wise this is accomplished with the help of key
-attestation.
+Attestation is the process by which an entity produces evidence about itself that another party can use to evaluate the trustworthiness of that entity.
+This document describes a series of protocol extensions to the TLS 1.3 handshake that enables the binding of the TLS authentication key to a remote attestation session.
+As a result, a peer can use "attestation credentials" to authenticate itself to its peer during the setup of the TLS channel.
+This enables an attester, such as a confidential workload running in a Trusted Execution Environment (TEE), or an IoT device that is trying to authenticate itself to a network access point, to present a more comprehensive set of security metrics to its peer.
+This, in turn, allows for the implementation of authorization policies at the relying parties that are based on stronger security signals.
+These extensions have been designed to allow the peers to use any attestation technology, in any remote attestation topology, and mutually.
 
 --- middle
 
 #  Introduction
 
-Secure channel establishment in TLS ({{RFC8446}}) relies on
-authentication to afford each entity the confidence that exchanged data
-can only be accessed by the expected peer. When running a workload in a
-Trusted Execution Environment (TEE), the authentication process can be
-enhanced with remote attestation. Remote attestation allows the workload
-to offer guarantees about its security state, enabling more
-comprehensive security policies.
+Attestation is the process by which an entity produces evidence about itself that another party can use to evaluate the trustworthiness of that entity.
+This document describes a series of protocol extensions to the TLS 1.3 handshake that enables the binding of the TLS authentication key to a remote attestation session.
+As a result, a peer can use "attestation credentials", consisting of compound platform evidence and key attestation, to authenticate itself to its peer during the setup of the TLS channel.
+This enables an attester, such as a confidential workload running in a Trusted Execution Environment (TEE), or an IoT device that is trying to authenticate itself to a network access point, to present a more comprehensive set of security metrics to its peer.
+This, in turn, allows for the implementation of authorization policies at the relying parties that are based on stronger security signals.
 
-The Remote ATtestation ProcedureS (RATS) architecture {{-rats-arch}} defines two
-basic topological patterns for communication between an attester, a relying
-party, and a verifier, namely the background-check model and the passport model.
-These two models are fundamentally different, and thus require a different
-treatment when incorporated into the TLS handshake.
+Given the variety of deployed and emerging attestation technologies (e.g., {{TPM1.2}}, {{TPM2.0}}, {{-rats-eat}}) these extensions have been explicitly designed to be agnostic of the attestation formats.
+This is achieved by reusing the generic encapsulation defined in {{-cmw}} for transporting evidence and attestation result payloads in the TLS Certificate message.
+The proposed design supports both background-check and passport topologies, as described in {{Sections 5.2 and 5.1 of -rats-arch}}.
+This is detailed in {{evidence-extensions}} and {{attestation-results-extensions}}.
+This specification provides both one-way (server-only) and mutual (client and server) authentication using attestation credentials, and allows the attestation topologies at each peer to be independent of each other.
 
-The two models can be summarized as follows:
-
-- In the background check model, an attester provides evidence to a relying
-  party, who forwards it to a verifier for appraisal. The
-  verifier then computes the attestation result and sends it back to the relying
-  party. As the attestation evidence is generated and verified during the TLS
-  handshake, it is essential to ensure the evidence's freshness and
-  origin (refer to {{evidence-extensions}} for more details).
-  
-- In the passport model, the attester transmits evidence to the verifier
-  directly and receives an attestation result, which is then relayed to
-  the relying party. Given that the attestation result is not expected
-  to be generated in-band during the handshake, fewer inter-protocol
-  requirements must be satisfied (see
-  {{attestation-results-extensions}}).
-
-This specification supports both patterns. In the background check model, any
-attestation technology characteristics, such as evidence encoding format and
-semantics of the evidence contents, are agnostic to the TLS handshake itself.
-Similarly, in the passport model, the characteristics of the attestation results,
-such as encoding format and trust relationships, are agnostic to the TLS
-handshake. Moreover, this specification allows both peers to authenticate
-themselves using remote attestation credentials, and for their attestation
-topologies to be independent of each other.
-
-Several mechanisms for producing and encoding evidence are available, such as:
-
-- the Entity Attestation Token (EAT) {{I-D.ietf-rats-eat}}, 
-- the Trusted Platform Modules (TPMs) {{TPM1.2}} {{TPM2.0}},
-- the Android Key Attestation, and
-- Apple Key Attestation. 
-
-Likewise, there are different encodings available for attestation results. One
-such encoding, AR4SI {{?I-D.ietf-rats-ar4si}}, is being standardized by the RATS
-working group.
-
-However, this document does not specify how different attestation technologies
-should be defined, only that they should all be usable within our framework.
-Attestation mechanisms must be defined by companion specifications.
-
-To give the peer information that the handshake signing key is properly secured,
-the associated attestation result has to be appraised by the peer. This must be
-the case when either of the two remote attestation topologies is used. Hence,
-attestation evidence must contain the security state of both the signing key and
-of the platform hosting it. A Platform Attestation Service issues Platform
-Attestation Tokens (PAT) to prove that the Key Attestation Service has not been
-tampered with. The Key Attestation Service in turn issues Key Attestation Tokens
-(KAT) to prove that the signing key is secure, as described in {{handshake-overview}}. The
-security of the protocol critically depends on the verifiable binding between
-these two logically separate units of evidence.
+This document does not specify any attestation technology.
+Companion documents are expected to define specific attestation mechanisms.
 
 # Conventions and Terminology
+
+The reader is assumed to be familiar with the vocabulary and concepts defined in
+{{Section 4 of -rats-arch}}, and those in {{Section 2 of -rats-kat}}.
 
 The following terms are used in this document:
 
@@ -205,28 +154,26 @@ TLS Identity Key (TIK):
 TLS handshake.
 
 TIK-C, TIK-S:
-
 : The TIK that identifies the client or the server, respectively.
 
-The reader is assumed to be familiar with the vocabulary and concepts defined in
-{{-rats-arch}}, and those in {{-rats-kat}}.
-
-"Remote attestation evidence" is more succintly referred to as "evidence", and
-"remote attestation results" is more succintly referred to as "attestation
-results" throughout this document. "Remote attestation credentials", or
+"Remote attestation credentials", or
 "attestation credentials", is used to refer to both attestation evidence and
 attestation results, when no distinction needs to be made between them.
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this
-document are to be interpreted as described in RFC 2119 {{RFC2119}}.
+{::boilerplate bcp14-tagged}
 
 # Overview
 
-The Remote Attestation Procedures (RATS) architecture {{RFC9334}} defines two
-types of interaction models for attestation, namely the passport model and the
-background check model. The subsections below explain the difference in their
-interactions.
+The basic functional goal is to link the authenticated key exchange of TLS with an interleaved remote attestation session in such a way that the key used to sign the handshake can be proven to be residing within the boundaries of an attested TEE.
+The requirement is that the attester can provide evidence containing the security status of both the signing key and the platform that is hosting it.
+The associated security goal is to obtain such binding so that no replay, relay or splicing from an adversary is possible.
+
+Throughout the document, we will assume the conceptual attester model described in {{Section 3 of -rats-kat}}, where TEE attestation is provided by a Platform Attestation Token (PAT) signed by the attester's "attesting environment".
+Among other security metrics, the PAT contains evidence about the integrity of a "Key Attestation Service" executing within the TEE which issues a Key Attestation Token (KAT) for the TLS handshake signing key (TIK) as described in {{handshake-overview}}.
+
+The protocol's security relies on the verifiable binding between these two logically separate units of evidence.
+
+# Attestation Extensions
 
 As typical with new features in TLS, the client indicates support for the new
 extension in the ClientHello message. The newly introduced extensions allow
