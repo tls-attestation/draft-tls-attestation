@@ -237,6 +237,7 @@ model is in use.
 When either the evidence or the attestation results extension is successfully
 negotiated, the content of the corresponding Certificate message contains a
 payload that is encoded based on the wrapper defined in {{-cmw}}.
+Both JSON and CBOR serializations are allowed in CMW, with the emitter choosing which serialization to use.
 
 In TLS a client has to demonstrate possession of the private key via the
 CertificateVerify message, when client-based authentication is requested. The
