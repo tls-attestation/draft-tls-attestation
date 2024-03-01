@@ -268,7 +268,7 @@ attester from its trusted verifiers can be cached and used for any number of
 subsequent TLS handshakes, as long as the freshness policy requirements are
 satisfied.
 
-This protocol supports both monolithic and split implementation. In a monolithic
+This protocol supports both monolithic and split implementations. In a monolithic
 implementation, the TLS stack is completely embedded within the TEE. In a split
 implementation, the TLS stack is located outside the TEE, but any private keys
 (and in particular, the TIK) only exist within the TEE. In order to support
