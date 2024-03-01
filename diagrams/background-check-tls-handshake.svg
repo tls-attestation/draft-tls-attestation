@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="1136" width="576" viewBox="0 0 576 1136" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="1136" width="600" viewBox="0 0 600 1136" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px">
 <path d="M 8,32 L 8,64" fill="none" stroke="black"/>
 <path d="M 8,96 L 8,1056" fill="none" stroke="black"/>
 <path d="M 32,64 L 32,96" fill="none" stroke="black"/>
@@ -12,28 +12,28 @@
 <path d="M 368,32 L 368,64" fill="none" stroke="black"/>
 <path d="M 400,64 L 400,1120" fill="none" stroke="black"/>
 <path d="M 440,32 L 440,64" fill="none" stroke="black"/>
-<path d="M 456,16 L 456,64" fill="none" stroke="black"/>
-<path d="M 528,64 L 528,1072" fill="none" stroke="black"/>
-<path d="M 568,16 L 568,64" fill="none" stroke="black"/>
-<path d="M 568,144 L 568,1056" fill="none" stroke="black"/>
-<path d="M 456,16 L 568,16" fill="none" stroke="black"/>
+<path d="M 480,16 L 480,64" fill="none" stroke="black"/>
+<path d="M 552,64 L 552,1072" fill="none" stroke="black"/>
+<path d="M 592,16 L 592,64" fill="none" stroke="black"/>
+<path d="M 592,128 L 592,1072" fill="none" stroke="black"/>
+<path d="M 480,16 L 592,16" fill="none" stroke="black"/>
 <path d="M 8,32 L 112,32" fill="none" stroke="black"/>
 <path d="M 168,32 L 240,32" fill="none" stroke="black"/>
 <path d="M 368,32 L 440,32" fill="none" stroke="black"/>
 <path d="M 8,64 L 112,64" fill="none" stroke="black"/>
 <path d="M 168,64 L 240,64" fill="none" stroke="black"/>
 <path d="M 368,64 L 440,64" fill="none" stroke="black"/>
-<path d="M 456,64 L 568,64" fill="none" stroke="black"/>
+<path d="M 480,64 L 592,64" fill="none" stroke="black"/>
 <path d="M 8,96 L 120,96" fill="none" stroke="black"/>
-<path d="M 8,128 L 552,128" fill="none" stroke="black"/>
+<path d="M 8,128 L 592,128" fill="none" stroke="black"/>
 <path d="M 40,160 L 200,160" fill="none" stroke="black"/>
 <path d="M 32,272 L 192,272" fill="none" stroke="black"/>
 <path d="M 200,384 L 392,384" fill="none" stroke="black"/>
 <path d="M 208,512 L 400,512" fill="none" stroke="black"/>
-<path d="M 400,592 L 520,592" fill="none" stroke="black"/>
-<path d="M 408,624 L 528,624" fill="none" stroke="black"/>
-<path d="M 400,656 L 520,656" fill="none" stroke="black"/>
-<path d="M 408,688 L 528,688" fill="none" stroke="black"/>
+<path d="M 400,592 L 544,592" fill="none" stroke="black"/>
+<path d="M 408,624 L 552,624" fill="none" stroke="black"/>
+<path d="M 400,656 L 544,656" fill="none" stroke="black"/>
+<path d="M 408,688 L 552,688" fill="none" stroke="black"/>
 <path d="M 208,752 L 400,752" fill="none" stroke="black"/>
 <path d="M 40,848 L 200,848" fill="none" stroke="black"/>
 <path d="M 32,912 L 192,912" fill="none" stroke="black"/>
@@ -42,18 +42,16 @@
 <path d="M 200,976 L 224,976" fill="none" stroke="black"/>
 <path d="M 208,1008 L 224,1008" fill="none" stroke="black"/>
 <path d="M 200,1040 L 392,1040" fill="none" stroke="black"/>
-<path d="M 24,1072 L 552,1072" fill="none" stroke="black"/>
+<path d="M 24,1072 L 592,1072" fill="none" stroke="black"/>
 <path d="M 208,1104 L 392,1104" fill="none" stroke="black"/>
 <path d="M 120,96 C 128.83064,96 136,103.16936 136,112" fill="none" stroke="black"/>
-<path d="M 552,128 C 560.83064,128 568,135.16936 568,144" fill="none" stroke="black"/>
 <path d="M 224,928 C 232.83064,928 240,935.16936 240,944" fill="none" stroke="black"/>
 <path d="M 224,960 C 232.83064,960 240,952.83064 240,944" fill="none" stroke="black"/>
 <path d="M 224,976 C 232.83064,976 240,983.16936 240,992" fill="none" stroke="black"/>
 <path d="M 224,1008 C 232.83064,1008 240,1000.83064 240,992" fill="none" stroke="black"/>
 <path d="M 24,1072 C 15.16936,1072 8,1064.83064 8,1056" fill="none" stroke="black"/>
-<path d="M 552,1072 C 560.83064,1072 568,1064.83064 568,1056" fill="none" stroke="black"/>
-<polygon class="arrowhead" points="528,656 516,650.4 516,661.6" fill="black" transform="rotate(0,520,656)"/>
-<polygon class="arrowhead" points="528,592 516,586.4 516,597.6" fill="black" transform="rotate(0,520,592)"/>
+<polygon class="arrowhead" points="552,656 540,650.4 540,661.6" fill="black" transform="rotate(0,544,656)"/>
+<polygon class="arrowhead" points="552,592 540,586.4 540,597.6" fill="black" transform="rotate(0,544,592)"/>
 <polygon class="arrowhead" points="416,688 404,682.4 404,693.6" fill="black" transform="rotate(180,408,688)"/>
 <polygon class="arrowhead" points="416,624 404,618.4 404,629.6" fill="black" transform="rotate(180,408,624)"/>
 <polygon class="arrowhead" points="400,1104 388,1098.4 388,1109.6" fill="black" transform="rotate(0,392,1104)"/>
@@ -69,11 +67,11 @@
 <polygon class="arrowhead" points="48,848 36,842.4 36,853.6" fill="black" transform="rotate(180,40,848)"/>
 <polygon class="arrowhead" points="48,160 36,154.4 36,165.6" fill="black" transform="rotate(180,40,160)"/>
 <g class="text">
-<text x="512" y="36">Attestation</text>
+<text x="536" y="36">Attestation</text>
 <text x="60" y="52">Verifier X</text>
 <text x="204" y="52">Client</text>
 <text x="404" y="52">Server</text>
-<text x="496" y="52">Service</text>
+<text x="520" y="52">Service</text>
 <text x="72" y="116">TLS handshake</text>
 <text x="116" y="148">POST /newSession</text>
 <text x="88" y="180">201 Created</text>
@@ -95,12 +93,12 @@
 <text x="288" y="468">evidence_request(</text>
 <text x="264" y="484">type(a)</text>
 <text x="224" y="500">)</text>
-<text x="456" y="532">attest_key(</text>
-<text x="452" y="548">nonce,</text>
-<text x="448" y="564">TIK-S</text>
-<text x="416" y="580">)</text>
+<text x="472" y="532">attest_key(</text>
+<text x="468" y="548">nonce,</text>
+<text x="476" y="564">TIK-S-ID</text>
+<text x="432" y="580">)</text>
 <text x="464" y="612">CAB(KAT, PAT)</text>
-<text x="468" y="644">sign(TIK-S,hs)</text>
+<text x="480" y="644">sign(TIK-S-ID,hs)</text>
 <text x="456" y="676">sig</text>
 <text x="292" y="708">Certificate(KAT,PAT)</text>
 <text x="300" y="724">CertificateVerify(sig)</text>

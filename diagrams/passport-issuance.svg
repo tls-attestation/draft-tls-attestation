@@ -62,8 +62,8 @@
 <text x="192" y="244">}</text>
 <text x="408" y="276">attest_key(</text>
 <text x="404" y="292">nonce,</text>
-<text x="412" y="308">TIK-C or</text>
-<text x="424" y="324">TIK-S</text>
+<text x="424" y="308">TIK-C-ID or</text>
+<text x="436" y="324">TIK-S-ID</text>
 <text x="368" y="340">)</text>
 <text x="420" y="372">CAB(KAT,PAT)</text>
 <text x="252" y="404">POST /65728E8D</text>
