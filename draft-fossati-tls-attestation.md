@@ -118,7 +118,7 @@ The TLS handshake protocol allows authentication of one or both peers using stat
 In some cases, it is also desirable to ensure that the peer runtime environment is in a secure state.
 Attestation is the process by which an entity produces evidence about itself that another party can use to appraise whether that entity is found in a secure state.
 This document describes a series of protocol extensions to the TLS 1.3 handshake that enables the binding of the TLS authentication key to a remote attestation session.
-This enables an attester, such as a confidential workload running in a Trusted Execution Environment (TEE), or an IoT device that is trying to authenticate itself to a network access point, to present a more comprehensive set of security metrics to its peer.
+This enables such an entity, for example, a confidential workload running in a Trusted Execution Environment (TEE), or an IoT device that is trying to authenticate itself to a network access point, to present a more comprehensive set of security metrics to its peer.
 These extensions have been designed to allow the peers to use any attestation technology, in any remote attestation topology, and mutually.
 
 --- middle
