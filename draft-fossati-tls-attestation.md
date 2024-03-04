@@ -125,7 +125,7 @@ These extensions have been designed to allow the peers to use any attestation te
 
 #  Introduction
 
-Attestation is the process by which an entity produces evidence about itself that another party can use to evaluate the trustworthiness of that entity.
+Attestation {{-rats-arch}} is the process by which an entity produces evidence about itself that another party can use to evaluate the trustworthiness of that entity.
 This document describes a series of protocol extensions to the TLS 1.3 handshake that enables the binding of the TLS authentication key to a remote attestation session.
 As a result, a peer can use "attestation credentials", consisting of compound platform evidence and key attestation, to authenticate itself to its peer during the setup of the TLS channel.
 This enables an attester, such as a confidential workload running in a Trusted Execution Environment (TEE), or an IoT device that is trying to authenticate itself to a network access point, to present a more comprehensive set of security metrics to its peer.
