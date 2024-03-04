@@ -164,9 +164,14 @@ TLS handshake.
 TIK-C, TIK-S:
 : The TIK that identifies the client or the server, respectively.
 
-"Remote attestation credentials", or
-"attestation credentials", is used to refer to both attestation evidence and
-attestation results, when no distinction needs to be made between them.
+TIK-C-ID, TIK-S-ID:
+
+: An identifier for TIK-C or respectively, TIK-S. This may be a fingerprint 
+(cryptographic hash) of the public key, but other implementations are possible.
+
+"Remote attestation credentials", or "attestation credentials", is used
+to refer to both attestation evidence and attestation results, when no
+distinction needs to be made between them.
 
 {::boilerplate bcp14-tagged}
 
@@ -212,6 +217,13 @@ When using the passport model, the remote attestation results obtained by the
 attester from its trusted verifiers can be cached and used for any number of
 subsequent TLS handshakes, as long as the freshness policy requirements are
 satisfied.
+
+This protocol supports both monolithic and split implementations. In a monolithic
+implementation, the TLS stack is completely embedded within the TEE. In a split
+implementation, the TLS stack is located outside the TEE, but any private keys
+(and in particular, the TIK) only exist within the TEE. In order to support
+both options, only the TIK's identity and its public component are ever
+passed between the Client or Server TLS stack and its Attestation Service.
 
 # Use of Remote Attestation Credentials in the TLS Handshake
 
@@ -878,7 +890,7 @@ confidential computing properties.
 |  |                    +----------------------->|               |    |
 |  |                    |                        | attest_key(   |    |
 |  |                    |                        |   nonce,      |    |
-|  |                    |                        |   TIK-S       |    |
+|  |                    |                        |   TIK-S-ID    |    |
 |  |                    |                        | )             |    |
 |  |                    |                        +-------------->|    |
 |  |                    |                        | CAB(KAT, PAT) |    |
@@ -892,7 +904,7 @@ confidential computing properties.
 |  |                    |  )                     |               |    |
 |  |                    | Certificate(KAT,PAT)   |               |    |
 |  |                    |<-----------------------+               |    |
-|  |                    |                        | sign(TIK-S,hs)|    |
+|  |                    |                        |sign(TIK-S-ID,hs)   |
 |  |                    |                        +-------------->|    |
 |  |                    |                        |     sig       |    |
 |  |                    |                        |<--------------+    |
@@ -1002,14 +1014,14 @@ the TLS server will terminate the exchange.
 |  |                | CertificateVerify      |                   |    |
 |  |  attest_key(   | Finished               |                   |    |
 |  |    nonce,      |<-----------------------+                   |    |
-|  |    TIK-C       |                        |                   |    |
+|  |    TIK-C-ID    |                        |                   |    |
 |  |  )             |                        |                   |    |
 |  |<---------------+                        |                   |    |
 |  |                |                        |                   |    |
 |  |  CAB(KAT, PAT) |                        |                   |    |
 |  +--------------->| Certificate(KAT,PAT)   |                   |    |
 |  |                +----------------------->|                   |    |
-|  | sign(TIK-C,hs) |                        |                   |    |
+|  |sign(TIK-C-ID,hs)                        |                   |    |
 |  |<---------------+                        |                   |    |
 |  |      sig       | CertificateVerify(sig) |                   |    |
 |  +--------------->| Finished               |                   |    |

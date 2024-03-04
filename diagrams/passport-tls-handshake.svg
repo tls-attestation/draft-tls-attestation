@@ -13,9 +13,9 @@
 <path d="M 384,16 L 384,48" fill="none" stroke="black"/>
 <path d="M 424,16 L 424,48" fill="none" stroke="black"/>
 <path d="M 456,48 L 456,640" fill="none" stroke="black"/>
-<path d="M 592,48 L 592,592" fill="none" stroke="black"/>
-<path d="M 640,128 L 640,576" fill="none" stroke="black"/>
+<path d="M 624,48 L 624,592" fill="none" stroke="black"/>
 <path d="M 672,16 L 672,48" fill="none" stroke="black"/>
+<path d="M 672,112 L 672,592" fill="none" stroke="black"/>
 <path d="M 8,16 L 80,16" fill="none" stroke="black"/>
 <path d="M 128,16 L 232,16" fill="none" stroke="black"/>
 <path d="M 280,16 L 384,16" fill="none" stroke="black"/>
@@ -25,27 +25,25 @@
 <path d="M 280,48 L 384,48" fill="none" stroke="black"/>
 <path d="M 424,48 L 672,48" fill="none" stroke="black"/>
 <path d="M 8,80 L 120,80" fill="none" stroke="black"/>
-<path d="M 8,112 L 624,112" fill="none" stroke="black"/>
+<path d="M 8,112 L 672,112" fill="none" stroke="black"/>
 <path d="M 40,224 L 448,224" fill="none" stroke="black"/>
-<path d="M 456,256 L 584,256" fill="none" stroke="black"/>
-<path d="M 464,288 L 592,288" fill="none" stroke="black"/>
+<path d="M 456,256 L 616,256" fill="none" stroke="black"/>
+<path d="M 464,288 L 624,288" fill="none" stroke="black"/>
 <path d="M 48,432 L 456,432" fill="none" stroke="black"/>
 <path d="M 40,448 L 64,448" fill="none" stroke="black"/>
 <path d="M 48,480 L 64,480" fill="none" stroke="black"/>
 <path d="M 40,496 L 64,496" fill="none" stroke="black"/>
 <path d="M 48,528 L 64,528" fill="none" stroke="black"/>
 <path d="M 40,560 L 448,560" fill="none" stroke="black"/>
-<path d="M 24,592 L 624,592" fill="none" stroke="black"/>
+<path d="M 24,592 L 672,592" fill="none" stroke="black"/>
 <path d="M 48,624 L 448,624" fill="none" stroke="black"/>
 <path d="M 120,80 C 128.83064,80 136,87.16936 136,96" fill="none" stroke="black"/>
-<path d="M 624,112 C 632.83064,112 640,119.16936 640,128" fill="none" stroke="black"/>
 <path d="M 64,448 C 72.83064,448 80,455.16936 80,464" fill="none" stroke="black"/>
 <path d="M 64,480 C 72.83064,480 80,472.83064 80,464" fill="none" stroke="black"/>
 <path d="M 64,496 C 72.83064,496 80,503.16936 80,512" fill="none" stroke="black"/>
 <path d="M 64,528 C 72.83064,528 80,520.83064 80,512" fill="none" stroke="black"/>
 <path d="M 24,592 C 15.16936,592 8,584.83064 8,576" fill="none" stroke="black"/>
-<path d="M 624,592 C 632.83064,592 640,584.83064 640,576" fill="none" stroke="black"/>
-<polygon class="arrowhead" points="592,256 580,250.4 580,261.6" fill="black" transform="rotate(0,584,256)"/>
+<polygon class="arrowhead" points="624,256 612,250.4 612,261.6" fill="black" transform="rotate(0,616,256)"/>
 <polygon class="arrowhead" points="472,288 460,282.4 460,293.6" fill="black" transform="rotate(180,464,288)"/>
 <polygon class="arrowhead" points="456,624 444,618.4 444,629.6" fill="black" transform="rotate(0,448,624)"/>
 <polygon class="arrowhead" points="456,560 444,554.4 444,565.6" fill="black" transform="rotate(0,448,560)"/>
@@ -65,7 +63,7 @@
 <text x="116" y="180">results_request(</text>
 <text x="252" y="196">trusted_verifiers([Verifier X, Verifier Y, ...])</text>
 <text x="56" y="212">)</text>
-<text x="528" y="244">sign(TIK-S, hs)</text>
+<text x="540" y="244">sign(TIK-S-ID, hs)</text>
 <text x="520" y="276">sig</text>
 <text x="96" y="308">ServerHello</text>
 <text x="88" y="324">{...}</text>
