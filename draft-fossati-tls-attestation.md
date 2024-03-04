@@ -243,6 +243,7 @@ model is in use.
 When either the evidence or the attestation results extension is successfully
 negotiated, the content of the corresponding Certificate message contains a
 payload that is encoded based on the wrapper defined in {{-cmw}}.
+Both JSON and CBOR serializations are allowed in CMW, with the emitter choosing which serialization to use.
 
 In TLS a client has to demonstrate possession of the private key via the
 CertificateVerify message, when client-based authentication is requested. The
@@ -454,41 +455,39 @@ attestation evidence alone, or an X.509 certificate alongside attestation
 evidence.
 
 ~~~~
-   enum { NUMERIC(0), STRING(1) } encodingType;
-   enum { ATTESTATION(0), CERT_ATTESTATION(1) } credentialType;
+    enum { CONTENT_FORMAT(0), MEDIA_TYPE(1) } typeEncoding;
+    enum { ATTESTATION(0), CERT_ATTESTATION(1) } credentialKind;
 
-   struct {
-        encodingType type;
-        credentialType cred_type;
-        select (encodingType) {
-            case NUMERIC:
-              uint16 content_format;
-            case STRING:
-               opaque media_type<0..2^16-1>;
+    struct {
+        credentialKind credential_kind;
+        typeEncoding type_encoding;
+        select (EvidenceType.type_encoding) {
+            case CONTENT_FORMAT:
+                uint16 content_format;
+            case MEDIA_TYPE:
+                opaque media_type<0..2^16-1>;
         };
-   } EvidenceType;
-      
-   struct {
-           select(ClientOrServerExtension) {
-               case client:
-                 EvidenceType supported_evidence_types<1..2^8-1>;
-                 opaque nonce<0..2^8-1>;
-                 
-               case server:
-                 EvidenceType selected_evidence_type;
-           }
-   } evidenceRequestTypeExtension;
+    } EvidenceType;
 
-   struct {
-           select(ClientOrServerExtension) {
-               case client:
-                 EvidenceType supported_evidence_types<1..2^8-1>;
+    struct {
+        select(Handshake.msg_type) {
+            case client_hello:
+                EvidenceType supported_evidence_types<1..2^8-1>;
+                opaque nonce<8..2^8-1>;
+            case server_hello:
+                EvidenceType selected_evidence_type;
+        }
+    } evidenceRequestTypeExtension;
 
-               case server:
-                 EvidenceType selected_evidence_type;
-                 opaque nonce<0..2^8-1>;
-           }
-   } evidenceProposalTypeExtension;
+    struct {
+        select(Handshake.msg_type) {
+            case client_hello:
+                EvidenceType supported_evidence_types<1..2^8-1>;
+            case server_hello:
+                EvidenceType selected_evidence_type;
+                opaque nonce<8..2^8-1>;
+        }
+    } evidenceProposalTypeExtension;
 ~~~~
 {: #figure-extension-evidence title="TLS Extension Structure for Evidence."}
 
@@ -500,18 +499,18 @@ attestation evidence, as shown in {{figure-attest-only}}, and follows the
 model of {{RFC8446}}.
 
 ~~~~
-      struct {
-          select (certificate_type) {
-              case RawPublicKey:
+    struct {
+        select (certificate_type) {
+            case RawPublicKey:
                 /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
                 opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
 
-                /* payload used to convey evidence */
-              case attestation:
-                opaque evidence<1..2^24-1>;
-              
               case X509:
                 opaque cert_data<1..2^24-1>;
+
+              case attestation:
+                  /* payload used to convey evidence */
+                  opaque evidence<1..2^24-1>;
           };
           Extension extensions<0..2^16-1>;
       } CertificateEntry;
@@ -533,39 +532,40 @@ message, while the attestation evidence will be carried in the
 CertificateEntry extension, as shown in {{figure-cert-attest}}.
 
 ~~~~
-      struct {
-          select (certificate_type) {
-              case RawPublicKey:
+    struct {
+        select (certificate_type) {
+            case RawPublicKey:
                 /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
                 opaque ASN1_subjectPublicKeyInfo<1..2^24-1>;
               
-              /* X.509 certificate conveyed as usual */
-              case X509:
+            case X509:
+                /* X.509 certificate conveyed as usual */
                 opaque cert_data<1..2^24-1>;
-          };
-          /* attestation evidence conveyed as an extension, see below */
-          Extension extensions<0..2^16-1>;
+        };
+
+        /* attestation evidence conveyed as an extension, see below */
+        Extension extensions<0..2^16-1>;
       } CertificateEntry;
 
-      struct {
+    struct {
         opaque certificate_request_context<0..2^8-1>;
         CertificateEntry certificate_list<0..2^24-1>;
-      } Certificate;
+    } Certificate;
 
-      struct {
+    struct {
         ExtensionType extension_type;
         /* payload used to convey evidence */
         opaque extension_data<0..2^16-1>;
-      } Extension;
+    } Extension;
 
-      enum {
+    enum {
         /* other extension types defined in the IANA TLS 
-            ExtensionType Value registry */
+           ExtensionType Value registry */
 
         /* variant used to identify attestation evidence */
         attestation_evidence(60),
         (65535)
-      } ExtensionType;
+    } ExtensionType;
 ~~~~
 {: #figure-cert-attest title="Certificate Message when using PKIX and attestation."}
 
@@ -620,29 +620,29 @@ hashing is required for the binder.
 # Attestation Results Extensions (Passport Model) {#attestation-results-extensions}
 
 ~~~~
-   struct {
+    struct {
         opaque verifier_identity<0..2^16-1>;
-   } VerifierIdentityType;
+    } VerifierIdentityType;
       
-   struct {
-           select(ClientOrServerExtension) {
-               case client:
-                 VerifierIdentityType trusted_verifiers<1..2^8-1>;
+    struct {
+        select(Handshake.msg_type) {
+            case client_hello:
+                VerifierIdentityType trusted_verifiers<1..2^8-1>;
                  
-               case server:
-                 VerifierIdentityType selected_verifier;
-           }
-   } resultsRequestTypeExtension;
+            case server_hello:
+                VerifierIdentityType selected_verifier;
+        }
+    } resultsRequestTypeExtension;
 
-   struct {
-           select(ClientOrServerExtension) {
-               case client:
-                 VerifierIdentityType trusted_verifiers<1..2^8-1>;
+    struct {
+        select(Handshake.msg_type) {
+            case client_hello:
+                VerifierIdentityType trusted_verifiers<1..2^8-1>;
 
-               case server:
-                 VerifierIdentityType selected_verifier;
-           }
-   } resultsProposalTypeExtension;
+            case server_hello:
+                VerifierIdentityType selected_verifier;
+        }
+    } resultsProposalTypeExtension;
 ~~~~
 {: #figure-extension-results title="TLS Extension Structure for Attestation Results."}
 
