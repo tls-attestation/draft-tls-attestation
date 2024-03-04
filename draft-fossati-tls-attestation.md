@@ -64,6 +64,7 @@ informative:
   RFC9334: rats-arch
   I-D.ietf-rats-eat: rats-eat
   I-D.ietf-rats-ar4si: rats-ar4si
+  I-D.ietf-teep-architecture: teep-arch
   TPM1.2:
     target: https://trustedcomputinggroup.org/resource/tpm-main-specification/
     title: TPM Main Specification Level 2 Version 1.2, Revision 116
