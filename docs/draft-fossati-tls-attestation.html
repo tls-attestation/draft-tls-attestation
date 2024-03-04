@@ -1223,11 +1223,11 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Attestation in TLS/DTLS</td>
-<td class="right">February 2024</td>
+<td class="right">March 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Tschofenig, et al.</td>
-<td class="center">Expires 29 August 2024</td>
+<td class="center">Expires 5 September 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1240,12 +1240,12 @@ li > p:last-of-type:only-child {
 <dd class="internet-draft">draft-fossati-tls-attestation-04</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-02-26" class="published">26 February 2024</time>
+<time datetime="2024-03-04" class="published">4 March 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-08-29">29 August 2024</time></dd>
+<dd class="expires"><time datetime="2024-09-05">5 September 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1316,7 +1316,7 @@ attestation.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 29 August 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 September 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1616,7 +1616,8 @@ for guaranteeing freshness of the exchanged evidence when the background check
 model is in use.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <p id="section-3-3">When either the evidence or the attestation results extension is successfully
 negotiated, the content of the corresponding Certificate message contains a
-payload that is encoded based on the wrapper defined in <span>[<a href="#I-D.ietf-rats-msg-wrap" class="cite xref">I-D.ietf-rats-msg-wrap</a>]</span>.<a href="#section-3-3" class="pilcrow">¶</a></p>
+payload that is encoded based on the wrapper defined in <span>[<a href="#I-D.ietf-rats-msg-wrap" class="cite xref">I-D.ietf-rats-msg-wrap</a>]</span>.
+Both JSON and CBOR serializations are allowed in CMW, with the emitter choosing which serialization to use.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <p id="section-3-4">In TLS a client has to demonstrate possession of the private key via the
 CertificateVerify message, when client-based authentication is requested. The
 attestation payload must contain assertions relating to the client's TLS
@@ -1886,41 +1887,39 @@ evidence.<a href="#section-5-1" class="pilcrow">¶</a></p>
 <figure id="figure-5">
         <div class="alignLeft art-text artwork" id="section-5-2.1">
 <pre>
-   enum { NUMERIC(0), STRING(1) } encodingType;
-   enum { ATTESTATION(0), CERT_ATTESTATION(1) } credentialType;
+    enum { CONTENT_FORMAT(0), MEDIA_TYPE(1) } typeEncoding;
+    enum { ATTESTATION(0), CERT_ATTESTATION(1) } credentialKind;
 
-   struct {
-        encodingType type;
-        credentialType cred_type;
-        select (encodingType) {
-            case NUMERIC:
-              uint16 content_format;
-            case STRING:
-               opaque media_type&lt;0..2^16-1&gt;;
+    struct {
+        credentialKind credential_kind;
+        typeEncoding type_encoding;
+        select (EvidenceType.type_encoding) {
+            case CONTENT_FORMAT:
+                uint16 content_format;
+            case MEDIA_TYPE:
+                opaque media_type&lt;0..2^16-1&gt;;
         };
-   } EvidenceType;
+    } EvidenceType;
 
-   struct {
-           select(ClientOrServerExtension) {
-               case client:
-                 EvidenceType supported_evidence_types&lt;1..2^8-1&gt;;
-                 opaque nonce&lt;0..2^8-1&gt;;
+    struct {
+        select(Handshake.msg_type) {
+            case client_hello:
+                EvidenceType supported_evidence_types&lt;1..2^8-1&gt;;
+                opaque nonce&lt;8..2^8-1&gt;;
+            case server_hello:
+                EvidenceType selected_evidence_type;
+        }
+    } evidenceRequestTypeExtension;
 
-               case server:
-                 EvidenceType selected_evidence_type;
-           }
-   } evidenceRequestTypeExtension;
-
-   struct {
-           select(ClientOrServerExtension) {
-               case client:
-                 EvidenceType supported_evidence_types&lt;1..2^8-1&gt;;
-
-               case server:
-                 EvidenceType selected_evidence_type;
-                 opaque nonce&lt;0..2^8-1&gt;;
-           }
-   } evidenceProposalTypeExtension;
+    struct {
+        select(Handshake.msg_type) {
+            case client_hello:
+                EvidenceType supported_evidence_types&lt;1..2^8-1&gt;;
+            case server_hello:
+                EvidenceType selected_evidence_type;
+                opaque nonce&lt;8..2^8-1&gt;;
+        }
+    } evidenceProposalTypeExtension;
 </pre>
 </div>
 <figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
@@ -1940,18 +1939,18 @@ model of <span>[<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href
 <figure id="figure-6">
           <div class="alignLeft art-text artwork" id="section-5.1-2.1">
 <pre>
-      struct {
-          select (certificate_type) {
-              case RawPublicKey:
+    struct {
+        select (certificate_type) {
+            case RawPublicKey:
                 /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
                 opaque ASN1_subjectPublicKeyInfo&lt;1..2^24-1&gt;;
 
-                /* payload used to convey evidence */
-              case attestation:
-                opaque evidence&lt;1..2^24-1&gt;;
-
               case X509:
                 opaque cert_data&lt;1..2^24-1&gt;;
+
+              case attestation:
+                  /* payload used to convey evidence */
+                  opaque evidence&lt;1..2^24-1&gt;;
           };
           Extension extensions&lt;0..2^16-1&gt;;
       } CertificateEntry;
@@ -1982,39 +1981,40 @@ CertificateEntry extension, as shown in <a href="#_figure-cert-attest" class="au
 <figure id="figure-7">
           <div class="alignLeft art-text artwork" id="section-5.2-2.1">
 <pre>
-      struct {
-          select (certificate_type) {
-              case RawPublicKey:
+    struct {
+        select (certificate_type) {
+            case RawPublicKey:
                 /* From RFC 7250 ASN.1_subjectPublicKeyInfo */
                 opaque ASN1_subjectPublicKeyInfo&lt;1..2^24-1&gt;;
 
-              /* X.509 certificate conveyed as usual */
-              case X509:
+            case X509:
+                /* X.509 certificate conveyed as usual */
                 opaque cert_data&lt;1..2^24-1&gt;;
-          };
-          /* attestation evidence conveyed as an extension, see below */
-          Extension extensions&lt;0..2^16-1&gt;;
+        };
+
+        /* attestation evidence conveyed as an extension, see below */
+        Extension extensions&lt;0..2^16-1&gt;;
       } CertificateEntry;
 
-      struct {
+    struct {
         opaque certificate_request_context&lt;0..2^8-1&gt;;
         CertificateEntry certificate_list&lt;0..2^24-1&gt;;
-      } Certificate;
+    } Certificate;
 
-      struct {
+    struct {
         ExtensionType extension_type;
         /* payload used to convey evidence */
         opaque extension_data&lt;0..2^16-1&gt;;
-      } Extension;
+    } Extension;
 
-      enum {
+    enum {
         /* other extension types defined in the IANA TLS
-            ExtensionType Value registry */
+           ExtensionType Value registry */
 
         /* variant used to identify attestation evidence */
         attestation_evidence(60),
         (65535)
-      } ExtensionType;
+    } ExtensionType;
 </pre>
 </div>
 <figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
@@ -2096,29 +2096,29 @@ hashing is required for the binder.<a href="#section-5.2-9" class="pilcrow">¶</
 <figure id="figure-10">
         <div class="alignLeft art-text artwork" id="section-6-1.1">
 <pre>
-   struct {
+    struct {
         opaque verifier_identity&lt;0..2^16-1&gt;;
-   } VerifierIdentityType;
+    } VerifierIdentityType;
 
-   struct {
-           select(ClientOrServerExtension) {
-               case client:
-                 VerifierIdentityType trusted_verifiers&lt;1..2^8-1&gt;;
+    struct {
+        select(Handshake.msg_type) {
+            case client_hello:
+                VerifierIdentityType trusted_verifiers&lt;1..2^8-1&gt;;
 
-               case server:
-                 VerifierIdentityType selected_verifier;
-           }
-   } resultsRequestTypeExtension;
+            case server_hello:
+                VerifierIdentityType selected_verifier;
+        }
+    } resultsRequestTypeExtension;
 
-   struct {
-           select(ClientOrServerExtension) {
-               case client:
-                 VerifierIdentityType trusted_verifiers&lt;1..2^8-1&gt;;
+    struct {
+        select(Handshake.msg_type) {
+            case client_hello:
+                VerifierIdentityType trusted_verifiers&lt;1..2^8-1&gt;;
 
-               case server:
-                 VerifierIdentityType selected_verifier;
-           }
-   } resultsProposalTypeExtension;
+            case server_hello:
+                VerifierIdentityType selected_verifier;
+        }
+    } resultsProposalTypeExtension;
 </pre>
 </div>
 <figcaption><a href="#figure-10" class="selfRef">Figure 10</a>:
@@ -2846,7 +2846,7 @@ registry <span>[<a href="#TLS-Ext-Registry" class="cite xref">TLS-Ext-Registry</
 <dl class="references">
 <dt id="I-D.ietf-rats-msg-wrap">[I-D.ietf-rats-msg-wrap]</dt>
         <dd>
-<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Smith, N.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"RATS Conceptual Messages Wrapper (CMW)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-msg-wrap-03</span>, <time datetime="2024-01-29" class="refDate">29 January 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-03">https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-03</a>&gt;</span>. </dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Smith, N.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"RATS Conceptual Messages Wrapper (CMW)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-msg-wrap-04</span>, <time datetime="2024-02-27" class="refDate">27 February 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-04">https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-04</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
