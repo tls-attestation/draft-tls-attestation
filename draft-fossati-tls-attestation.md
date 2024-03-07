@@ -940,7 +940,7 @@ confidential computing properties.
 ## IoT Device Onboarding
 
 In this scenario, an IoT device is connected to a remote device management entity, which could be a cloud service provider or a network operator.
-It is important to note that there is no pre-existing relationship between the two parties.
+It is important to note that there is no pre-existing trust relationship between the two parties.
 
 The device management entity's responsibility is to guarantee that the device is running the intended firmware version, has not been tampered with, and is not being emulated or cloned.
 
