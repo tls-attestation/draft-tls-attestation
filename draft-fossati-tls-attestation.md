@@ -816,7 +816,7 @@ tracing in pandemic times, etc.
 
 In such scenarios, the users (e.g., the party providing the data input for the
 computation, the party consuming the computed results, or the party
-providing a proprietary ML model used in the computation) have two goals:
+providing a proprietary Machine Learning (ML) model used in the computation) have two goals:
 
 - Identifying the workload they are interacting with,
 - Making sure that the platform on which the workload executes is a
