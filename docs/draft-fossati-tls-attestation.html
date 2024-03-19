@@ -2523,13 +2523,9 @@ confidential computing properties.<a href="#section-9.1-9" class="pilcrow">¶</a
         <h3 id="name-iot-device-onboarding">
 <a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-iot-device-onboarding" class="section-name selfRef">IoT Device Onboarding</a>
         </h3>
-<p id="section-9.2-1">In this example, an IoT is onboarded to a cloud service provider (or to a
-network operator). In this scenario there is typically no a priori
-relationship between the device and the cloud service provider that 
-will remotely manage the device.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
-<p id="section-9.2-2">In such scenario, the cloud service provider wants to make sure
-that the device runs the correct version of firmware, has not been 
-rooted, is not emulated or cloned.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
+<p id="section-9.2-1">In this scenario, an IoT device is connected to a remote device management entity, which could be a cloud service provider or a network operator.
+We assume that, initially, the remote device management entity does not trust the device.<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-2">The device management entity's responsibility is to guarantee that the device is running the intended software version, has not been tampered with, and is not being emulated or cloned.<a href="#section-9.2-2" class="pilcrow">¶</a></p>
 <p id="section-9.2-3">The protocol flow is shown in <a href="#_figure-iot-example" class="auto internal xref">Figure 13</a> where the client 
 is the attester while the server is the relying party.<a href="#section-9.2-3" class="pilcrow">¶</a></p>
 <p id="section-9.2-4">The flow starts with the client initiating a TLS exchange with the TLS
