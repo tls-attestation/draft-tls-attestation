@@ -19,13 +19,13 @@ This document describes a series of protocol extensions to the TLS 1.3 handshake
 This enables an entity capable of producing attestation evidence, such as a confidential workload running in a Trusted Execution Environment (TEE), or an IoT device that is trying to authenticate itself to a network access point, to present a more comprehensive set of security metrics to its peer.
 These extensions have been designed to allow the peers to use any attestation technology, in any remote attestation topology, and mutually. 
     " name="description">
-<meta content="xml2rfc 3.20.0" name="generator">
+<meta content="xml2rfc 3.20.1" name="generator">
 <meta content="attestation" name="keyword">
 <meta content="RATS" name="keyword">
 <meta content="TLS" name="keyword">
 <meta content="draft-fossati-tls-attestation-05" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.20.0
+  xml2rfc 3.20.1
     Python 3.10.12
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
@@ -1224,7 +1224,7 @@ li > p:last-of-type:only-child {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Tschofenig, et al.</td>
-<td class="center">Expires 5 September 2024</td>
+<td class="center">Expires 20 September 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1237,12 +1237,12 @@ li > p:last-of-type:only-child {
 <dd class="internet-draft">draft-fossati-tls-attestation-05</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-03-04" class="published">4 March 2024</time>
+<time datetime="2024-03-19" class="published">19 March 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-09-05">5 September 2024</time></dd>
+<dd class="expires"><time datetime="2024-09-20">20 September 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1310,7 +1310,7 @@ These extensions have been designed to allow the peers to use any attestation te
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 5 September 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 20 September 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2327,9 +2327,9 @@ results_request extension in the ClientHello.<a href="#section-8.2.2-5" class="p
 resources hosted at a cloud service provider.  This is a typical
 scenario for secure, privacy-preserving multiparty computation,
 including anti-money laundering, drug development in healthcare, contact
-tracing in pandemic times, etc.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+tracing in pandemic times, Machine Learning (ML) model training, etc.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
 <p id="section-9.1-2">In such scenarios, the users (e.g., the party providing the data input for the
-computation, the consumer of the computed attestation results, the party
+computation, the party consuming the computed results, or the party
 providing a proprietary ML model used in the computation) have two goals:<a href="#section-9.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-9.1-3.1">
