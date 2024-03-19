@@ -61,6 +61,12 @@ author:
        organization: Huawei
        email: arto.niemi@huawei.com
 
+ -
+       ins: T. Fossati
+       name: Thomas Fossati
+       organization: Linaro
+       email: thomas.fossati@linaro.org
+
 normative:
   RFC2119:
   RFC8446: tls13
