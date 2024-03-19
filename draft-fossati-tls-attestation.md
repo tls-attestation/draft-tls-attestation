@@ -812,10 +812,10 @@ In this example, a confidential workload is executed on computational
 resources hosted at a cloud service provider.  This is a typical
 scenario for secure, privacy-preserving multiparty computation,
 including anti-money laundering, drug development in healthcare, contact
-tracing in pandemic times, etc.
+tracing in pandemic times, Machine Learning (ML) model training, etc.
 
 In such scenarios, the users (e.g., the party providing the data input for the
-computation, the consumer of the computed attestation results, the party
+computation, the party consuming the computed results, or the party
 providing a proprietary ML model used in the computation) have two goals:
 
 - Identifying the workload they are interacting with,
