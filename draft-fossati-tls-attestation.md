@@ -939,14 +939,10 @@ confidential computing properties.
 
 ## IoT Device Onboarding
 
-In this example, an IoT is onboarded to a cloud service provider (or to a
-network operator). In this scenario there is typically no a priori
-relationship between the device and the cloud service provider that 
-will remotely manage the device.
+In this scenario, an IoT device is connected to a remote device management entity, which could be a cloud service provider or a network operator.
+We assume that, initially, the remote device management entity does not trust the device.
 
-In such scenario, the cloud service provider wants to make sure
-that the device runs the correct version of firmware, has not been 
-rooted, is not emulated or cloned.
+The device management entity's responsibility is to guarantee that the device is running the intended software version, has not been tampered with, and is not being emulated or cloned.
 
 The protocol flow is shown in {{figure-iot-example}} where the client 
 is the attester while the server is the relying party.
