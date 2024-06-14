@@ -72,9 +72,12 @@ normative:
   RFC8446: tls13
   I-D.ietf-rats-msg-wrap: cmw
 informative:
+  RFC6960: ocsp
   I-D.bft-rats-kat: rats-kat
   RFC9334: rats-arch
   I-D.ietf-rats-eat: rats-eat
+  I-D.ietf-rats-daa: rats-daa
+  I-D.ietf-oauth-selective-disclosure-jwt: sd-jwt
   I-D.ietf-rats-ar4si: rats-ar4si
   I-D.ietf-teep-architecture: teep-arch
   TPM1.2:
@@ -94,6 +97,17 @@ informative:
   TLS-Ext-Registry: IANA.tls-extensiontype-values
   TLS-Param-Registry: IANA.tls-parameters
   I-D.acme-device-attest:
+  FIDO-REQS:
+    target: https://fidoalliance.org/specs/fido-security-requirements/
+    title: "FIDO Authenticator Security Requirements"
+    authors:
+       -
+        ins: B. Peirani
+        name: Beatrice Peirani
+       -
+        ins: J. Verrept
+        name: Johan Verrept
+    date: November 2021
   RA-TLS:
     target: https://arxiv.org/abs/1801.05863
     title: Integrating Remote Attestation with Transport Layer Security
@@ -1060,6 +1074,22 @@ the TLS server will terminate the exchange.
 # Security Considerations {#sec-cons}
 
 TBD.
+
+# Privacy Considerations {#priv-cons}
+
+In background-check mode, the Verifier has access to detailed information about the Attester TLS peer's TCB through Evidence.
+The Verifier also knows the exact time and the party with whom the secure channel establishment is attempted (i.e., the RP).
+The privacy implications are similar to online OCSP {{-ocsp}}.
+Although the Verifier is trusted by the RP TLS peer, the same may not apply to the Attester TLS peer.
+Some ways to address this include:
+
+* Redacting privacy-sensitive evidence claims,
+* Using selective disclosure (e.g., SD-JWT {{-sd-jwt}} with EAT {{-rats-eat}}),
+* Co-locating the Verifier role with the RP,
+* Utilizing privacy-preserving attestation schemes (e.g., DAA {{-rats-daa}}), or
+* Utilizing Attesters manufactured with group identities (e.g., {{FIDO-REQS}}).
+
+Note that the equivalent of OCSP "stapling" involves using a passport topology where the Verifier's involvement is unrelated to the TLS session.
 
 # IANA Considerations
 
