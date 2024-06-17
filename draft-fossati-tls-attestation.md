@@ -1085,7 +1085,7 @@ The privacy implications are similar to online OCSP {{-ocsp}}.
 While the RP may trust the Verifier not to disclose any information it receives, the same cannot be assumed for the Attester, which generally has no prior relationship with the Verifier.
 Some ways to address this include:
 
-* Redacting privacy-sensitive evidence claims,
+* Client-side redaction of privacy-sensitive evidence claims,
 * Using selective disclosure (e.g., SD-JWT {{-sd-jwt}} with EAT {{-rats-eat}}),
 * Co-locating the Verifier role with the RP,
 * Utilizing privacy-preserving attestation schemes (e.g., DAA {{-rats-daa}}), or
