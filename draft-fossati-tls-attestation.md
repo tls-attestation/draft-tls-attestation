@@ -1077,6 +1077,9 @@ TBD.
 
 # Privacy Considerations {#priv-cons}
 
+In this section, we are assuming that the Attester is a TLS client, representing an individual person.
+We are concerned about the potential leakage of unnecessary information about that person, such as the correlation of different connections initiated by them.
+
 In background-check mode, the Verifier not only has access to detailed information about the Attester's TCB through Evidence, but it also knows the exact time and the party with whom the secure channel establishment is attempted (i.e., the RP).
 The privacy implications are similar to online OCSP {{-ocsp}}.
 Although the Verifier is trusted by the RP, the same may not apply to the Attester.
