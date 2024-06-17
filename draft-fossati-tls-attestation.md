@@ -1082,7 +1082,7 @@ We are concerned about the potential leakage of unnecessary information about th
 
 In background-check mode, the Verifier not only has access to detailed information about the Attester's TCB through Evidence, but it also knows the exact time and the party with whom the secure channel establishment is attempted (i.e., the RP).
 The privacy implications are similar to online OCSP {{-ocsp}}.
-Although the Verifier is trusted by the RP, the same may not apply to the Attester.
+While the RP may trust the Verifier not to disclose any information it receives, the same cannot be assumed for the Attester, which generally has no prior relationship with the Verifier.
 Some ways to address this include:
 
 * Redacting privacy-sensitive evidence claims,
