@@ -1091,6 +1091,8 @@ Some ways to address this include:
 * Utilizing privacy-preserving attestation schemes (e.g., DAA {{-rats-daa}}), or
 * Utilizing Attesters manufactured with group identities (e.g., {{FIDO-REQS}}).
 
+The latter two also have the property of hiding the peer's identity from the RP.
+
 Note that the equivalent of OCSP "stapling" involves using a passport topology where the Verifier's involvement is unrelated to the TLS session.
 
 # IANA Considerations
