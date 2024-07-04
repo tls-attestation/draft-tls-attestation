@@ -1095,6 +1095,8 @@ The latter two also have the property of hiding the peer's identity from the RP.
 
 Note that the equivalent of OCSP "stapling" involves using a passport topology where the Verifier's involvement is unrelated to the TLS session.
 
+Due to the inherent asymmetry of the TLS protocol, if the Attester acts as the TLS server, a malicious TLS client could potentially retrieve sensitive information from attestation evidence and then terminate the connection before disclosing any information to the peer.
+
 # IANA Considerations
 
 ## TLS Extensions
