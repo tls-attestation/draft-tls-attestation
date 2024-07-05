@@ -851,7 +851,7 @@ security state, packaged into a CAB.  The server then signs a transcript
 hash with the (attested) identity key, and sends the attestation
 evidence and the signature in the Certificate and the CertificateVerify
 messages respectively. The transcript hash, denoted `hs` in the figure
-below, follows the `Transcript-Hash` definition from {{Section 4.4 of
+below, follows the `Transcript-Hash` definition from {{Section 4.4.1 of
 -tls13}}.
 
 The client forwards the attestation evidence to the verifier using the
