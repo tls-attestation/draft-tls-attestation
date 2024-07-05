@@ -538,6 +538,10 @@ CertificateEntry extension, as shown in {{figure-cert-attest}}.
 
 The encoding of the evidence structure is defined in {{-cmw}}.
 
+In this use-case the nonce negotiated by the two peers is not used directly as
+an input to the attestation evidence generation mechanism. Instead, it is used
+in the derivation steps for a channel binder.
+
 ### Channel binding
 
 As described in {{usage-variants}}, this authentication mechanism is meant
@@ -602,6 +606,8 @@ channel_binder = TLS-Handshake-Exporter("attestation-binder", nonce-seed, nonce-
 channel_binder must be computed by both peers: the attester must use it as a
 challenge value when generating attestation evidence; the relying party must
 verify its correct inclusion in the evidence it received during the handshake.
+Both parties must adjust the size of channel_binder to the length advertised by
+the attester.
 
 # Attestation Results Extensions (Passport Model) {#attestation-results-extensions}
 
