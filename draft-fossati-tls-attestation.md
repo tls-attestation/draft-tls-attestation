@@ -538,51 +538,76 @@ CertificateEntry extension, as shown in {{figure-cert-attest}}.
 
 The encoding of the evidence structure is defined in {{-cmw}}.
 
+In this use-case the nonce negotiated by the two peers is not used directly as
+an input to the attestation evidence generation mechanism. Instead, it is used
+in the derivation steps for a channel binder.
+
+### Channel binding
+
 As described in {{usage-variants}}, this authentication mechanism is meant
-primarily for carrying platform attestation evidence to provide more
-context to the relying party. This evidence must be cryptographically bound
-to the TLS handshake to prevent relay attacks. An Attestation Channel Binder as
-described in {{binding-mech}} is therefore used when the attestation scheme
-does not allow the binding data to be part of the token. The structure of
-the binder is given in {{figure-tls-binder}}.
+primarily for carrying platform attestation evidence to provide more context to
+the relying party. This evidence must be cryptographically bound to the TLS
+handshake to prevent relay attacks. A channel binder value plays this role,
+allowing a TLS handshake and a remote attestation session to be linked together
+in a way that is verifiable by the relying party.
+
+Creation of the channel binder relies on a new TLS exporter, the Handshake
+Exporter. The Handshake Exporter, in turn, uses a new secret value
+(handshake_exporter_secret) derived as part of the key schedule.
+handshake_exporter_secret is derived from Handshake Secret using Derive-Secret,
+with "h exp master" as the label and a handshake context stretching from
+ClientHello to ServerHello. This derivation step is shown in
+{{figure-handshake-exporter-secret}}. 
 
 ~~~~
-attestation_channel_binder = {
-  &(nonce: 1) => bstr .size (8..64)
-  &(ik_pub_fingerprint: 2) => bstr .size (16..64)
-  &(channel_binder: 3) => bstr .size (16..64)
-}
+                  [...]
+                    |
+                    v
+     (EC)DHE --> HKDF-Extract = Handshake Secret
+                    |
+                  [...]
+                    |
+                    +-----> Derive-Secret(., "h exp master",
+                    |                     ClientHello...ServerHello)
+                    |              = handshake_exporter_secret
+                    v
+               Derive-Secret(., "derived", "")
+                    |
+                    v
+                  [...]
 ~~~~
-{: #figure-tls-binder title="Format of TLS channel binder."}
+{: #figure-handshake-exporter-secret title="Derivation of the Handshake Exporter Secret for use in the associated exporter."}
 
-- Nonce is the value provided as a challenge by the relying party.
-- The identity key fingerprint (ik_pub_fingerprint) is a hash of the
-  Subject Public Key Info from the leaf X.509 certificate transmitted in
-  the handshake.
-- The channel binder (channel_binder) is a value obtained from the early
-  exporter mechanism offered by the TLS implementation ({{Section 7.5 of
-  RFC8446}}). This Early Exporter Value (EEV) must be obtained immediately
-  following the ServerHello message, using 'attestation-binder' as the label,
-  an empty context, and with the key length set to 32 bytes.
-  {{figure-early-exporter}} shows this computation using the notation from
-  {{RFC8446}}.
+The Handshake Secret is used to generate the TLS Handshake Exporter value as
+defined in {{figure-handshake-exporter}}. This exporter becomes available after
+the ServerHello message, and must be offered by implementation as a separate API
+(i.e., TLS-Handshake-Exporter) to the TLS-Exporter and TLS-Early-Exporter.
 
 ~~~~
-TLS-Early-Exporter(label, context_value, key_length) =
+TLS-Handshake-Exporter(label, context_value, key_length) =
        HKDF-Expand-Label(
-              Derive-Secret(early_exporter_master_secret, label, ""),
+              Derive-Secret(handshake_exporter_secret, label, ""),
               "exporter", Hash(context_value), key_length)
-
-channel_binder = TLS-Early-Exporter(label = "attestation-binder",
-                                    context_value = "", key_length = 32)
 ~~~~
-{: #figure-early-exporter title="Usage of TLS v1.3 early exporter for channel binding."}
+{: #figure-handshake-exporter title="Definition of the TLS Handshake Exporter."}
 
-A hash of the binder must be included in the attestation evidence. Previous
-to hashing, the binder must be encoded as described in {{binding-mech}}.
+Using this new exporter, the channel binder is then defined as a call to
+TLS-Handshake-Exporter with "attestation-binder" as the label, and the nonce
+negotiated between attester and relying party as context. This is shown in
+{{figure-channel-binder}}, where nonce-seed is the negotiated nonce. 
 
-The hash algorithm negotiatied within the handshake must be used wherever
-hashing is required for the binder.
+~~~~
+channel_binder = TLS-Handshake-Exporter("attestation-binder", nonce-seed, nonce-size)
+      = HKDF-Expand-Label(Derive-Secret(handshake_exporter_secret, "attestation-binder", ""),
+                      "exporter", Hash(nonce-seed), nonce-size)
+~~~~
+{: #figure-channel-binder title="Usage of TLS Handshake Exporter for channel binding."}
+
+channel_binder must be computed by both peers: the attester must use it as a
+challenge value when generating attestation evidence; the relying party must
+verify its correct inclusion in the evidence it received during the handshake.
+Both parties must adjust the size of channel_binder to the length advertised by
+the attester.
 
 # Attestation Results Extensions (Passport Model) {#attestation-results-extensions}
 
@@ -1157,82 +1182,6 @@ possible:
     this document in {{attest-only}}. A possible instantiation of the KAT
     is described in {{I-D.bft-rats-kat}}.
 
-
-# Cross-protocol Binding Mechanism {#binding-mech}
-
-Note: This section describes a protocol-agnostic mechanism which is used in
-the context of TLS within the body of the draft. The mechanism might, in
-the future, be spun out into its own document.
-
-One of the issues that must be addressed when using remote attestation as
-an authentication mechanism is the binding to the outer protocol (i.e., the
-protocol requiring authentication). For every instance of the combined
-protocol, the remote attestation credentials must be verifiably linked to
-the outer protocol. The main reason for this requirement is security: a
-lack of binding can result in the attestation credentials being relayed.
-
-If the attestation credentials can be enhanced freely and in a verifiable way,
-the binding can be performed by inserting the relevant data as new claims. If
-the ways of enhancing the attestation credentials are more restricted, ad-hoc
-solutions can be devised which address the issue. For example, many roots of
-trust only allow a small amount (32-64 bytes) of user-provided data which will
-be included in the attestation token. If more data must be included, it must
-therefore be compressed. In this case, the problem is compounded by the need to
-also include a challenge value coming from the relying party. The verification
-steps also become more complex, as the binding data must be returned from the
-verifier and checked by the relying party.
-
-However, regardless of how the binding and verification are performed,
-similar but distinct approaches need to be taken for every protocol into
-which remote attestation is embedded, as the type or semantics of the
-binding data could differ. A more standardised way of tackling this issue
-would therefore be beneficial. This appendix presents a solution to this
-problem, in the context of attestation evidence.
-
-## Binding Mechanism
-
-The core of the binding mechanism consists of a new token format - the
-Attestation Channel Binder - that represents a set of binders as a CBOR
-map. Binders are individual pieces of data with an unambiguous definition.
-Each binder is a name/value pair, where the name must be an integer and the
-value must be a byte string.
-
-Each protocol using the Attestation Channel Binder to bind attestation
-credentials must define its Attestation Channel Binder using CDDL. The only
-mandated binder is the challenger nonce which must use the value 1 as a
-name. Every other name/value pair must come with a text description of its
-semantics. The byte strings forming the values of binders can be
-size-restricted where this value is known.
-
-Attestation Channel Binders are encoded in CBOR, following the CBOR core
-deterministic encoding requirements ({{Section 4.2.1 of !RFC8949}}).
-
-An example Attestation Channel Binder is shown below.
-
-~~~~
-attestation_channel_binder = {
-  &(nonce: 1) => bstr .size (8..64)
-  &(ik_pub_fingerprint: 2) => bstr .size 32
-  &(session_key_binder: 3) => bstr .size 32
-}
-~~~~
-{: #figure-binder-format title="Format of a possible TLS Attestation Channel Binder."}
-
-## Usage
-
-When a Attestation Channel Binder is used to compress data to fit the space
-afforded by an attestation scheme, the encoded binder must be hashed. Since
-the relying party has access to all the data expected in the binder, the
-binder itself need not be conveyed. How the hashing algorithm is chosen,
-used, and conveyed must be defined per outer protocol. If the digest size
-does not match the user data size mandated by the attestation scheme, the
-digest is truncated or expanded appropriately.
-
-The verifier must first hash the encoded token received from the relying
-party and then compare the hashes. The challenge value included in the
-binder can then be extracted and verified. If verification is successful,
-binder correctness can also be assumed by the relying party, as
-verification was done with the values it expected.
 
 # History
 
