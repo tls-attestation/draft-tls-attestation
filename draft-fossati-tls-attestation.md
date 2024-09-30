@@ -887,10 +887,11 @@ in the specular extension and proceed by invoking a local API
 attestation using the nonce supplied by the verifier.  The returned
 evidence binds the identity key (TIK-S) with the platform identity and
 security state, packaged into a CAB.  The server then signs a transcript
-hash (represented by `hs` in the figure below) of the handshake context
-and the server's Certificate message with the (attested) identity key,
-and sends the attestation evidence together with the signature over to
-the client.
+hash with the (attested) identity key, and sends the attestation
+evidence and the signature in the Certificate and the CertificateVerify
+messages respectively. The transcript hash, denoted `hs` in the figure
+below, follows the `Transcript-Hash` definition from {{Section 4.4.1 of
+-tls13}}.
 
 The client forwards the attestation evidence to the verifier using the
 previously established session, obtains the attestation result (AR) and
