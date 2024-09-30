@@ -20,22 +20,22 @@ This document describes a series of protocol extensions to the TLS 1.3 handshake
 This enables an entity capable of producing attestation evidence, such as a confidential workload running in a Trusted Execution Environment (TEE), or an IoT device that is trying to authenticate itself to a network access point, to present a more comprehensive set of security metrics to its peer.
 These extensions have been designed to allow the peers to use any attestation technology, in any remote attestation topology, and mutually. 
     " name="description">
-<meta content="xml2rfc 3.22.0" name="generator">
+<meta content="xml2rfc 3.23.1" name="generator">
 <meta content="attestation" name="keyword">
 <meta content="RATS" name="keyword">
 <meta content="TLS" name="keyword">
 <meta content="draft-fossati-tls-attestation-07" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.22.0
+  xml2rfc 3.23.1
     Python 3.10.12
     ConfigArgParse 1.7
-    google-i18n-address 3.1.0
+    google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.4
     lxml 4.9.4
-    platformdirs 4.2.2
+    platformdirs 4.3.6
     pycountry 24.6.1
-    PyYAML 6.0.1
+    PyYAML 6.0.2
     requests 2.32.3
     setuptools 59.6.0
     wcwidth 0.2.13
@@ -1171,7 +1171,7 @@ section .olCompact {
 tt, code {
   background-color: transparent;
 }
-p tt, p code, li tt, li code {
+p tt, p code, li tt, li code, dt tt, dt code {
   background-color: #f8f8f8;
 }
 /* Tweak the pre margin -- 0px doesn't come out well */
@@ -1223,11 +1223,11 @@ li > p:last-of-type:only-child {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Attestation in TLS/DTLS</td>
-<td class="right">July 2024</td>
+<td class="right">September 2024</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Tschofenig, et al.</td>
-<td class="center">Expires 9 January 2025</td>
+<td class="center">Expires 3 April 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1240,12 +1240,12 @@ li > p:last-of-type:only-child {
 <dd class="internet-draft">draft-fossati-tls-attestation-07</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-07-08" class="published">8 July 2024</time>
+<time datetime="2024-09-30" class="published">30 September 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-01-09">9 January 2025</time></dd>
+<dd class="expires"><time datetime="2025-04-03">3 April 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1317,7 +1317,7 @@ These extensions have been designed to allow the peers to use any attestation te
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 January 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 3 April 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1518,7 +1518,7 @@ Companion documents are expected to define specific attestation mechanisms.<a hr
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-terminology" class="section-name selfRef">Conventions and Terminology</a>
       </h2>
 <p id="section-2-1">The reader is assumed to be familiar with the vocabulary and concepts defined in
-<span><a href="https://rfc-editor.org/rfc/rfc9334#section-4" class="relref">Section 4</a> of [<a href="#RFC9334" class="cite xref">RFC9334</a>]</span>, and those in <span><a href="https://datatracker.ietf.org/doc/html/draft-bft-rats-kat-03#section-2" class="relref">Section 2</a> of [<a href="#I-D.bft-rats-kat" class="cite xref">I-D.bft-rats-kat</a>]</span>.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<span><a href="https://rfc-editor.org/rfc/rfc9334#section-4" class="relref">Section 4</a> of [<a href="#RFC9334" class="cite xref">RFC9334</a>]</span>, and those in <span><a href="https://datatracker.ietf.org/doc/html/draft-bft-rats-kat-04#section-2" class="relref">Section 2</a> of [<a href="#I-D.bft-rats-kat" class="cite xref">I-D.bft-rats-kat</a>]</span>.<a href="#section-2-1" class="pilcrow">¶</a></p>
 <p id="section-2-2">The following terms are used in this document:<a href="#section-2-2" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlNewline" id="section-2-3">
         <dt id="section-2-3.1">TLS Identity Key (TIK):</dt>
@@ -1556,7 +1556,7 @@ appear in all capitals, as shown here.<a href="#section-2-5" class="pilcrow">¶<
 <p id="section-3-1">The basic functional goal is to link the authenticated key exchange of TLS with an interleaved remote attestation session in such a way that the key used to sign the handshake can be proven to be residing within the boundaries of an attested TEE.
 The requirement is that the attester can provide evidence containing the security status of both the signing key and the platform that is hosting it.
 The associated security goal is to obtain such binding so that no replay, relay or splicing from an adversary is possible.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">Throughout the document, we will assume the conceptual attester model described in <span><a href="https://datatracker.ietf.org/doc/html/draft-bft-rats-kat-03#section-3" class="relref">Section 3</a> of [<a href="#I-D.bft-rats-kat" class="cite xref">I-D.bft-rats-kat</a>]</span>, where TEE attestation is provided by a Platform Attestation Token (PAT) signed by the attester's "attesting environment".
+<p id="section-3-2">Throughout the document, we will assume the conceptual attester model described in <span><a href="https://datatracker.ietf.org/doc/html/draft-bft-rats-kat-04#section-3" class="relref">Section 3</a> of [<a href="#I-D.bft-rats-kat" class="cite xref">I-D.bft-rats-kat</a>]</span>, where TEE attestation is provided by a Platform Attestation Token (PAT) signed by the attester's "attesting environment".
 Among other security metrics, the PAT contains evidence about the integrity of a "Key Attestation Service" executing within the TEE which issues a Key Attestation Token (KAT) for the TLS handshake signing key (TIK) as described in <a href="#handshake-overview" class="auto internal xref">Section 5.1</a>.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <p id="section-3-3">The protocol's security relies on the verifiable binding between these two logically separate units of evidence.<a href="#section-3-3" class="pilcrow">¶</a></p>
 </section>
@@ -2388,10 +2388,10 @@ in the specular extension and proceed by invoking a local API
 attestation using the nonce supplied by the verifier.  The returned
 evidence binds the identity key (TIK-S) with the platform identity and
 security state, packaged into a CAB.  The server then signs a transcript
-hash (represented by <code>hs</code> in the figure below) of the handshake context
-and the server's Certificate message with the (attested) identity key,
-and sends the attestation evidence together with the signature over to
-the client.<a href="#section-9.1-7" class="pilcrow">¶</a></p>
+hash with the (attested) identity key, and sends the attestation
+evidence and the signature in the Certificate and the CertificateVerify
+messages respectively. The transcript hash, denoted <code>hs</code> in the figure
+below, follows the <code>Transcript-Hash</code> definition from <span><a href="https://rfc-editor.org/rfc/rfc8446#section-4.4.1" class="relref">Section 4.4.1</a> of [<a href="#RFC8446" class="cite xref">RFC8446</a>]</span>.<a href="#section-9.1-7" class="pilcrow">¶</a></p>
 <p id="section-9.1-8">The client forwards the attestation evidence to the verifier using the
 previously established session, obtains the attestation result (AR) and
 checks whether it is acceptable according to its local policy.  If so,
@@ -2856,6 +2856,7 @@ registry <span>[<a href="#TLS-Ext-Registry" class="cite xref">TLS-Ext-Registry</
 </div>
 </section>
 </div>
+<div id="sec-combined-references">
 <section id="section-13">
       <h2 id="name-references">
 <a href="#section-13" class="section-number selfRef">13. </a><a href="#name-references" class="section-name selfRef">References</a>
@@ -2868,7 +2869,7 @@ registry <span>[<a href="#TLS-Ext-Registry" class="cite xref">TLS-Ext-Registry</
 <dl class="references">
 <dt id="I-D.ietf-rats-msg-wrap">[I-D.ietf-rats-msg-wrap]</dt>
         <dd>
-<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Smith, N.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"RATS Conceptual Messages Wrapper (CMW)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-msg-wrap-06</span>, <time datetime="2024-07-01" class="refDate">1 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-06">https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-06</a>&gt;</span>. </dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Smith, N.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"RATS Conceptual Messages Wrapper (CMW)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-msg-wrap-08</span>, <time datetime="2024-09-02" class="refDate">2 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-08">https://datatracker.ietf.org/doc/html/draft-ietf-rats-msg-wrap-08</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
@@ -2901,27 +2902,27 @@ registry <span>[<a href="#TLS-Ext-Registry" class="cite xref">TLS-Ext-Registry</
 <dd class="break"></dd>
 <dt id="I-D.acme-device-attest">[I-D.acme-device-attest]</dt>
         <dd>
-<span class="refAuthor">Weeks, B.</span>, <span class="refTitle">"Automated Certificate Management Environment (ACME) Device Attestation Extension"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-acme-device-attest-02</span>, <time datetime="2024-02-22" class="refDate">22 February 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-acme-device-attest-02">https://datatracker.ietf.org/doc/html/draft-acme-device-attest-02</a>&gt;</span>. </dd>
+<span class="refAuthor">Weeks, B.</span>, <span class="refTitle">"Automated Certificate Management Environment (ACME) Device Attestation Extension"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-acme-device-attest-03</span>, <time datetime="2024-08-25" class="refDate">25 August 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-acme-device-attest-03">https://datatracker.ietf.org/doc/html/draft-acme-device-attest-03</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.bft-rats-kat">[I-D.bft-rats-kat]</dt>
         <dd>
-<span class="refAuthor">Brossard, M.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"An EAT-based Key Attestation Token"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-bft-rats-kat-03</span>, <time datetime="2024-03-04" class="refDate">4 March 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-bft-rats-kat-03">https://datatracker.ietf.org/doc/html/draft-bft-rats-kat-03</a>&gt;</span>. </dd>
+<span class="refAuthor">Brossard, M.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">H. Tschofenig</span>, <span class="refTitle">"An EAT-based Key Attestation Token"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-bft-rats-kat-04</span>, <time datetime="2024-09-03" class="refDate">3 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-bft-rats-kat-04">https://datatracker.ietf.org/doc/html/draft-bft-rats-kat-04</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-oauth-selective-disclosure-jwt">[I-D.ietf-oauth-selective-disclosure-jwt]</dt>
         <dd>
-<span class="refAuthor">Fett, D.</span>, <span class="refAuthor">Yasuda, K.</span>, and <span class="refAuthor">B. Campbell</span>, <span class="refTitle">"Selective Disclosure for JWTs (SD-JWT)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-oauth-selective-disclosure-jwt-10</span>, <time datetime="2024-07-08" class="refDate">8 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-selective-disclosure-jwt-10">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-selective-disclosure-jwt-10</a>&gt;</span>. </dd>
+<span class="refAuthor">Fett, D.</span>, <span class="refAuthor">Yasuda, K.</span>, and <span class="refAuthor">B. Campbell</span>, <span class="refTitle">"Selective Disclosure for JWTs (SD-JWT)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-oauth-selective-disclosure-jwt-12</span>, <time datetime="2024-09-03" class="refDate">3 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-selective-disclosure-jwt-12">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-selective-disclosure-jwt-12</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-rats-ar4si">[I-D.ietf-rats-ar4si]</dt>
         <dd>
-<span class="refAuthor">Voit, E.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Hardjono, T.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">V. Scarlata</span>, <span class="refTitle">"Attestation Results for Secure Interactions"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-ar4si-06</span>, <time datetime="2024-03-04" class="refDate">4 March 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-ar4si-06">https://datatracker.ietf.org/doc/html/draft-ietf-rats-ar4si-06</a>&gt;</span>. </dd>
+<span class="refAuthor">Voit, E.</span>, <span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Hardjono, T.</span>, <span class="refAuthor">Fossati, T.</span>, and <span class="refAuthor">V. Scarlata</span>, <span class="refTitle">"Attestation Results for Secure Interactions"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-ar4si-07</span>, <time datetime="2024-09-02" class="refDate">2 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-ar4si-07">https://datatracker.ietf.org/doc/html/draft-ietf-rats-ar4si-07</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-rats-daa">[I-D.ietf-rats-daa]</dt>
         <dd>
-<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Newton, C.</span>, <span class="refAuthor">Chen, L.</span>, and <span class="refAuthor">D. Thaler</span>, <span class="refTitle">"Direct Anonymous Attestation for the Remote Attestation Procedures Architecture"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-daa-05</span>, <time datetime="2024-03-04" class="refDate">4 March 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-daa-05">https://datatracker.ietf.org/doc/html/draft-ietf-rats-daa-05</a>&gt;</span>. </dd>
+<span class="refAuthor">Birkholz, H.</span>, <span class="refAuthor">Newton, C.</span>, <span class="refAuthor">Chen, L.</span>, and <span class="refAuthor">D. Thaler</span>, <span class="refTitle">"Direct Anonymous Attestation for the Remote Attestation Procedures Architecture"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-daa-06</span>, <time datetime="2024-09-05" class="refDate">5 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-daa-06">https://datatracker.ietf.org/doc/html/draft-ietf-rats-daa-06</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-rats-eat">[I-D.ietf-rats-eat]</dt>
         <dd>
-<span class="refAuthor">Lundblade, L.</span>, <span class="refAuthor">Mandyam, G.</span>, <span class="refAuthor">O'Donoghue, J.</span>, and <span class="refAuthor">C. Wallace</span>, <span class="refTitle">"The Entity Attestation Token (EAT)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-eat-29</span>, <time datetime="2024-07-08" class="refDate">8 July 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-29">https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-29</a>&gt;</span>. </dd>
+<span class="refAuthor">Lundblade, L.</span>, <span class="refAuthor">Mandyam, G.</span>, <span class="refAuthor">O'Donoghue, J.</span>, and <span class="refAuthor">C. Wallace</span>, <span class="refTitle">"The Entity Attestation Token (EAT)"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-rats-eat-31</span>, <time datetime="2024-09-06" class="refDate">6 September 2024</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-31">https://datatracker.ietf.org/doc/html/draft-ietf-rats-eat-31</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.ietf-teep-architecture">[I-D.ietf-teep-architecture]</dt>
         <dd>
@@ -2959,6 +2960,7 @@ registry <span>[<a href="#TLS-Ext-Registry" class="cite xref">TLS-Ext-Registry</
 </section>
 </div>
 </section>
+</div>
 <div id="usage-variants">
 <section id="appendix-A">
       <h2 id="name-design-rationale-x509-and-a">
