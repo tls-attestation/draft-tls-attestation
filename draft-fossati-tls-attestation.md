@@ -2,6 +2,7 @@
 title: Using Attestation in Transport Layer Security (TLS) and Datagram Transport Layer Security (DTLS)
 abbrev: Attestation in TLS/DTLS
 docname: draft-fossati-tls-attestation-07
+submissiontype: IETF
 category: std
 
 ipr: trust200902
@@ -78,7 +79,6 @@ informative:
   I-D.ietf-rats-eat: rats-eat
   I-D.ietf-rats-daa: rats-daa
   I-D.ietf-oauth-selective-disclosure-jwt: sd-jwt
-  I-D.ietf-rats-ar4si: rats-ar4si
   I-D.ietf-teep-architecture: teep-arch
   TPM1.2:
     target: https://trustedcomputinggroup.org/resource/tpm-main-specification/
