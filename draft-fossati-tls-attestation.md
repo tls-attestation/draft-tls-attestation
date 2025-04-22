@@ -863,7 +863,10 @@ Certificate message sent by the server. The verifier identity in the
 results_request extension MUST contain a single value selected from the
 results_request extension in the ClientHello.
 
-# Background-Check Model Examples
+# Example Use Cases
+
+This section includes specific usage scenarios of attested TLS. Both scenarios
+are based on the background-check validation model.
 
 ## Cloud Confidential Computing
 
