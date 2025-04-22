@@ -579,10 +579,6 @@ CertificateEntry extension, as shown in {{figure-cert-attest}}.
 
 The encoding of the evidence structure is defined in {{-cmw}}.
 
-In this use-case the nonce negotiated by the two peers is not used directly as
-an input to the attestation evidence generation mechanism. Instead, it is used
-in the derivation steps for a channel binder.
-
 # Attestation Results Extensions (Passport Model) {#attestation-results-extensions}
 
 ~~~~
