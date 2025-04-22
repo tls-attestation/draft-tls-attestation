@@ -220,7 +220,7 @@ well as guarantees on platform integrity.
 The attestation-only mode is included in this document for specialized use cases, including initial provisioning of the TLS stack. In these cases, additional security controls SHOULD be provided,
 such as hardware-enforced time limitations, or use of platform-level APIs in the case of cloud infrastructure.
 
-## TLS Identity Key (TIK)
+## TLS Identity Key (TIK) {#tik}
 
 A central property of this protocol is that it binds a peer's identity key, the TIK, to the TLS handshake.
 This applies to the client's identity (TIK-C), the server's identity (TIK-S) or both.
@@ -270,7 +270,7 @@ implementation, the TLS stack is located outside the TEE, but any private keys
 both options, only the TIK's identity and its public component are ever
 passed between the Client or Server TLS stack and its Attestation Service.
 While the two types of implementations may have identical functionality,
-their security properties are not, see {{sec-guarantees}} for more details.
+their security properties often differ, see {{sec-guarantees}} for more details.
 
 # Use of Remote Attestation Credentials in the TLS Handshake
 
@@ -289,8 +289,10 @@ attestation, and the other uses the background check model.
 
 ## Handshake Overview {#handshake-overview}
 
-The handshake defined here is analogous to certificate-based authentication in a regular TLS handshake. Instead of the certificate's private key, we use
-the TIK identity key. This key is attested, with attestation being carried
+The handshake defined here is analogous to certificate-based authentication in a regular TLS handshake.
+We use the TLS Identity Key (TIK) which is either a stand-alone key or is identical
+to the certificate's private key (see {{tik}}).
+This key is attested, with attestation being carried
 by the Certificate message. Following that, the peer being attested proves possession of the private key using the CertificateVerify message.
 
 Depending on the use case, the protocol supports peer authentication
@@ -301,8 +303,6 @@ The current version of the document assumes the KAT/PAT construct of
 {{I-D.bft-rats-kat}}. Not all platforms support this model, and a document
 that defines private key attestation for use in TLS Attestation as defined here, must specify:
 
-* The format and the lifetime of TIK (e.g. an ephemeral, per session TIK vs.
-a long lived one).
 * How the key is attested using a structure carried by the
 Certificate message.
 * How proof of possession is performed.
