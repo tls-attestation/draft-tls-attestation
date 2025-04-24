@@ -191,7 +191,7 @@ TIK-C-ID, TIK-S-ID:
 : An identifier for TIK-C or respectively, TIK-S. This may be a fingerprint 
 (cryptographic hash) of the public key, but other implementations are possible.
 
-"Remote attestation credentials", or "attestation credentials", is used
+The term "remote attestation credentials", or "attestation credentials", is used
 to refer to both attestation evidence and attestation results, when no
 distinction needs to be made between them.
 
@@ -298,7 +298,7 @@ The handshake defined here is analogous to certificate-based authentication in a
 We use the TLS Identity Key (TIK) which is either a stand-alone key or is identical
 to the certificate's private key (see {{tik}}).
 This key is attested, with attestation being carried
-by the Certificate message. Following that, the peer being attested proves possession of the private key using the CertificateVerify message.
+in the Certificate message. Following that, the peer being attested proves possession of the private key using the CertificateVerify message.
 
 Depending on the use case, the protocol supports peer authentication
 using attestation only, or using both attestation and a regular public
@@ -394,7 +394,7 @@ Auth | {CertificateVerify}
 ## TLS Client Authenticating Using Attestation Results 
 
 In this use case the TLS client, as the attester, provides attestation results
-to the TLS server. The TLS client is the attester and the the TLS server acts as
+to the TLS server. The TLS client is the attester and the TLS server acts as
 a relying party. Prior to delivering its Certificate message, the client must
 contact the verifier (not shown in the diagram) to receive the attestation
 results that it will use as credentials.
