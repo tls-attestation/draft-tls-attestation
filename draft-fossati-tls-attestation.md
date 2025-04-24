@@ -96,6 +96,8 @@ informative:
     date: November 2019
   TLS-Ext-Registry: IANA.tls-extensiontype-values
   TLS-Param-Registry: IANA.tls-parameters
+  iana-media-types: IANA.media-types
+  iana-content-formats: IANA.core-parameters/content-formats
   I-D.acme-device-attest:
   FIDO-REQS:
     target: https://fidoalliance.org/specs/fido-security-requirements/
@@ -212,7 +214,7 @@ The protocol's security relies on the verifiable binding between these two logic
 
 As noted, the protocol supports either combined platform attestation with X.509 certificate authentication, or attestation only.
 
-Attestation alone is vulnerable to identity spoofing attacks, in particular when zero-day attacks exist for a class of hardware. (TODO: reference). Therefore it needs to be combined with traditional authentication, which in the case of TLS takes the form of X.509 certificates.
+Attestation when used alone is vulnerable to identity spoofing attacks, in particular when zero-day attacks exist for a class of hardware. (TODO: reference). Therefore it needs to be combined with traditional authentication, which in the case of TLS takes the form of X.509 certificates.
 
 We RECOMMEND that regular applications only use the combined mode, which provides the full security guarantees of an authenticated TLS handshake (for the peer/peers being authenticated) as
 well as guarantees on platform integrity.
@@ -274,7 +276,7 @@ implementation, the TLS stack is located outside the TEE, but any private keys
 (and in particular, the TIK) only exist within the TEE. In order to support
 both options, only the TIK's identity and its public component are ever
 passed between the Client or Server TLS stack and its Attestation Service.
-While the two types of implementations may have identical functionality,
+While the two types of implementations offer identical functionality,
 their security properties often differ, see {{sec-guarantees}} for more details.
 
 # Use of Remote Attestation Credentials in the TLS Handshake
@@ -425,7 +427,7 @@ Auth | {CertificateVerify}
 {: #figure-passport-model1 title="TLS Client Providing Results to TLS Server."}
 
 
-## TLS Server Authenticating Using Results
+## TLS Server Authenticating Using Attestation Results
 
 In this use case the TLS client, as the relying party, requests attestation
 results from the TLS server. Prior to delivering its Certificate message, the
@@ -460,7 +462,7 @@ Auth | {CertificateVerify}
 
 # Evidence Extensions (Background Check Model) {#evidence-extensions}
 
-The EvidenceType structure also contains an indicator for the type of credential
+The EvidenceType structure contains an indicator for the type of credential
 expected in the Certificate message. The credential can either contain
 attestation evidence alone, or an X.509 certificate alongside attestation
 evidence.
@@ -474,7 +476,7 @@ evidence.
         typeEncoding type_encoding;
         select (EvidenceType.type_encoding) {
             case CONTENT_FORMAT:
-                uint16 content_format; /* TODO where is this defined? */
+                uint16 content_format;
             case MEDIA_TYPE:
                 opaque media_type<0..2^16-1>;
         };
@@ -501,6 +503,9 @@ evidence.
     } evidenceProposalTypeExtension;
 ~~~~
 {: #figure-extension-evidence title="TLS Extension Structure for Evidence."}
+
+Values for media_type are defined in {{iana-media-types}}.
+Values for content_format are defined in {{iana-content-formats}}.
 
 ## Attestation-only {#attest-only}
 
@@ -717,7 +722,7 @@ extension, then three outcomes are possible:
 
 The evidence_proposal extension in the ClientHello indicates
 the evidence types the client is able to provide to the server,
-when challenged using a certificate_request message.  If the
+when challenged using a CertificateRequest message.  If the
 server wants to request evidence from the client, it MUST include the
 evidence_proposal extension in the EncryptedExtensions. This
 evidence_proposal extension in the EncryptedExtensions then indicates
@@ -725,10 +730,10 @@ what evidence format the client is requested to provide in a
 subsequent Certificate message.  The value conveyed in the
 evidence_proposal extension by the server MUST be selected from one of the
 values provided in the evidence_proposal extension sent in the
-ClientHello.  The server MUST also send a certificate_request
+ClientHello.  The server MUST also send a CertificateRequest
 message.
 
-If the server does not send a certificate_request message or none 
+If the server does not send a CertificateRequest message or none 
 of the evidence types supported by the client (as indicated in the
 evidence_proposal extension in the ClientHello) match the
 server-supported evidence types, then the evidence_proposal
@@ -745,6 +750,10 @@ the ClientHello.
 
 ## Passport Model
 
+The `results_proposal` and `results_request` extensions are used to negotiate
+the attested TLS protocol, and specifically the verifier identities supported by each peer. These
+extensions are included in the ClientHello and ServerHello messages.
+
 ### Client Hello
 
 To indicate the support for passing attestation results in TLS following the
@@ -752,7 +761,7 @@ passport model, clients include the results_proposal and/or the results_request
 extensions in the ClientHello message.
 
 The results_proposal extension in the ClientHello message indicates the verifier
-identities from which it can relay attestation results, when requested using a
+identities from which the client can relay attestation results, when requested using a
 CertificateRequest message.
 
 The results_request extension in the ClientHello message indicates the verifier
@@ -796,16 +805,16 @@ possible:
 
 The results_proposal extension in the ClientHello indicates the verifier
 identities from which the client is able to provide attestation results to the
-server, when challenged using a certificate_request message.  If the server
+server, when challenged using a CertificateRequest message.  If the server
 wants to request evidence from the client, it MUST include the results_proposal
 extension in the EncryptedExtensions. This results_proposal extension in the
 EncryptedExtensions then indicates what verifier the client is requested to
 provide attestation results from in a subsequent Certificate message.  The value
 conveyed in the results_proposal extension by the server MUST be selected from
 one of the values provided in the results_proposal extension sent in the
-ClientHello.  The server MUST also send a certificate_request message.
+ClientHello.  The server MUST also send a CertificateRequest message.
 
-If the server does not send a certificate_request message or none of the
+If the server does not send a CertificateRequest message or none of the
 verifier identities proposed by the client (as indicated in the results_proposal
 extension in the ClientHello) match the server-trusted verifiers, then the
 results_proposal extension in the ServerHello MUST be omitted.
@@ -1179,9 +1188,9 @@ possible:
       the third party CA and the attester prior to certificate issuance,
       after which the CA adds an extension indicating that the certificate
       key has fulfilled some verification policy.
-    - Explicit signalling via existing methods, e.g. using a policy OID in
+    - Explicit signaling via existing methods, e.g. using a policy OID in
       the end-entity certificate.
-    - Implicit signalling, e.g. via the issuer name.
+    - Implicit signaling, e.g. via the issuer name.
 3. X.509 certificates alongside a PAT: This use case assumes that a keypair
     with a corresponding certificate already exists and that the owner
     wishes to continue using it. As a consequence, there is no
