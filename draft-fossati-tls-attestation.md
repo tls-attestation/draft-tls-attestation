@@ -237,7 +237,9 @@ As typical with new features in TLS, the client indicates support for the new
 extension in the ClientHello message. The newly introduced extensions allow
 remote attestation credentials and nonces to be exchanged. The nonces are used
 for guaranteeing freshness of the exchanged evidence when the background check
-model is in use.
+model is in use. Nonces are not used in the passport model, because the expectation
+of freshness is more relaxed and is only governed by the lifetime of the signed
+attestation results.
 
 When either the Evidence or the Attestation Results extension is successfully
 negotiated, the content of the corresponding Certificate message contains a
