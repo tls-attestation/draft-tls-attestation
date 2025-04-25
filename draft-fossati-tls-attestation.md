@@ -217,7 +217,7 @@ As noted, the protocol supports either combined platform attestation with X.509 
 Attestation when used alone is vulnerable to identity spoofing attacks, in particular when zero-day attacks exist for a class of hardware. (TODO: reference). Therefore it needs to be combined with traditional authentication, which in the case of TLS takes the form of X.509 certificates.
 
 We RECOMMEND that regular applications only use the combined mode, which provides the full security guarantees of an authenticated TLS handshake (for the peer/peers being authenticated) as
-well as guarantees on platform integrity.
+well as guarantees of platform integrity.
 
 The attestation-only mode is included in this document for specialized use cases, including initial provisioning of the TLS stack. In these cases, additional security controls SHOULD be provided,
 such as hardware-enforced time limitations, or use of platform-level APIs in the case of cloud infrastructure.
